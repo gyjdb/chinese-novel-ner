@@ -1,0 +1,40 @@
+{
+ "description": "Stage 1 arms B1 and B2: the large backbone hfl/chinese-roberta-wwm-ext-large (24 layers, hidden 1024, about 330M parameters; same team, pre-training corpus and vocabulary as the base model, but different depth, width and training details) on the 100 teacher chapters of weak build 20261004-teacher100, setting W (B1, weak S3 labels) or T (B2, Opus teacher labels). B2 - A2 is the effect of swapping the whole backbone (base -> large), not of the parameter count alone; with A1, A2, B1 it forms the labels x backbone 2x2, and B1 - A1 versus B2 - A2 shows whether the swap helps more once the labels are better. Schedule as train_s1_base (about 1300 planned steps over 40 epochs, dev every 2 epochs, patience 6, sufficiency recorded) except: lr 2e-5 (the usual large-model rate; base uses 3e-5), batch 16 reached as 2 micro-batches of 8 with grad_accumulation 2 (the micro losses are weighted by their share of the batch's informative tokens, so the loss and the gradient equal the whole batch's and the schedule is unchanged); the orchestrator measures memory on the RTX 5080 (16 GB) first and may set grad_accumulation to 1 if a batch of 16 fits, which changes nothing but speed. Download approved on 2026-10-04 (1.31 GB, Apache-2.0; `python -m novel_ner.tagger download configs/train_s1_large.json`). Three seeds per arm. Nothing tuned on dev2 or the test.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261004-teacher100",
+ "settings_intended": ["W", "T"],
+ "arms": {"W": "B1 (weak S3 labels, 100 chapters, large)", "T": "B2 (Opus teacher labels, the same 100 chapters, large)"},
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext-large",
+  "revision": "a25cc9e05974bd9687e528edd516f2cfdb3f5db9",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 1,306,484,351 bytes plus small tokenizer files (about 1.31 GB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 2e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "grad_accumulation": 2,
+ "grad_accumulation_note": "micro-batch 8; set to 1 if the orchestrator's memory test shows a batch of 16 fits on the 16 GB card (same loss and schedule either way)",
+ "max_epochs": 40,
+ "eval_every": 2.0,
+ "patience": 6,
+ "planned_steps_note": "as train_s1_base: about 32 steps per epoch x 40 epochs = about 1300 steps",
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

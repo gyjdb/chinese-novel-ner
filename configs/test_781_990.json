@@ -1,0 +1,22 @@
+{
+ "description": "Formal test chapters: chapters 781-990, stratified by plot unit. Training and the dictionary only use chapters up to 780, so the test has names never seen in training. Annotate in the order of test_781_990.order.json and take the first n chapters; n is fixed after the GPT calibration and before any test chapter is annotated, and never extended after scores are seen.",
+ "snapshot": "to0990-79dc77f8d354",
+ "range": [781, 990],
+ "seed": 20261001,
+ "exclude_dev_config": "configs/annotate_dev.json",
+ "n": 60,
+ "n_note": "fixed on 2026-10-01 after the GPT calibration (runs/20261001-calib-gpt61), before any test chapter was annotated",
+ "batch_size": 5,
+ "frozen": {"guide_version": "1.1", "instructions_version": "v1"},
+ "strata_source": "the source project's plot-unit file at commit 80234299d6cad3fc11e82493272ea6de90a80a4c (read only; this snapshot predates the unit ids for 781-990)",
+ "strata": [
+  {"unit_id": "u0039", "kind": "mainline", "name": "009 区（江江与首都安全区）", "start": 781, "end": 810},
+  {"unit_id": "u0040", "kind": "mainline", "name": "去 011 区的列车（维度风暴）", "start": 811, "end": 821},
+  {"unit_id": "u0041", "kind": "mainline", "name": "011 区（宴会与次类石）", "start": 822, "end": 854},
+  {"unit_id": "u0042", "kind": "mainline", "name": "去海上大世界的列车", "start": 855, "end": 861},
+  {"unit_id": "u0043", "kind": "dungeon", "name": "友谊天长地久", "start": 862, "end": 889},
+  {"unit_id": "u0044", "kind": "mainline", "name": "去 W37 基地站的列车", "start": 890, "end": 896},
+  {"unit_id": "u0045", "kind": "dungeon", "name": "加密信息", "start": 897, "end": 983},
+  {"unit_id": "u0046", "kind": "mainline", "name": "去 002 区（只夜城）", "start": 984, "end": 990}
+ ]
+}

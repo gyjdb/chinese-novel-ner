@@ -1,0 +1,53 @@
+{
+ "description": "Round 5 candidate mix11 (configs/recipes_v1.json): A3's stage 2 fine-tuning (from the frozen S3 checkpoint of the same seed; the ORIGINAL teacher labels of the 100 chapters, build 20261004-teacher100 setting T) with a replay of weak windows: every epoch trains on all teacher windows of the 100 chapters plus 1 x as many weak S3 windows of build 20261003-weak_v2, sampled without replacement with the run's seed from the other 649 training chapters (the teacher chapters are excluded from the pool), shuffled together, so what the 749-chapter stage learned is not overwritten while the teacher conventions are learned; every window keeps its own allowed label sets (partial-label NLL over both sources). Trainer: `python -m novel_ner.finetune train <this config> --setting T --seed N --run-id <id>`; tagger.train would ignore the replay block and re-run A3, so it must not be used with this config. Steps per epoch = ceil((1 + 1) x 500 teacher windows / 16) = 63, so 2520 planned steps over 40 epochs (A3: 32 per epoch, 1280 planned); eval every 2 epochs, patience 6, lr 3e-5, batch 16 and everything else as A3. config.json keeps the teacher build as the primary weak_labels record (the run scores as a model trained on the 100 teacher chapters) and records the replay under 'replay' (build, file sha256, pool size, sampled per epoch); metrics.json records the windows per epoch by source and each epoch's draw. Three seeds. Nothing tuned on dev2 or the test. --- A3, which this candidate changes only by the replay: Stage 1 arm A3: the base backbone first trained on the 749 training chapters' weak S3 labels (the existing, frozen S3 checkpoints runs/20261003-tag-S3-s<seed>-dev31, one per seed) and then fine-tuned on the 100 teacher chapters' Opus labels (setting T of weak build 20261004-teacher100), NEEDLE's two-stage recipe. init_from_run names the checkpoint to start from; '{seed}' is replaced by the run's seed, so seed 1 starts from the S3 seed-1 run, seed 2 from seed 2, and so on (the pairing is recorded in config.json as init_from, with that run's config.json sha256). The run refuses a checkpoint from another backbone id. Everything else (schedule, lr, batch, sufficiency record, checkpoint rule) is train_s1_base: about 1300 planned steps, dev every 2 epochs, patience 6; the sufficiency record shows whether fine-tuning from a trained model needed fewer steps. Intended setting: T only (A3 compares with A2 = T from the fresh backbone: does the weak pre-training still help once teacher labels exist?); W from an S3 checkpoint would re-train on the same label source and is not an arm. Three seeds. Nothing tuned on dev2 or the test.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261004-teacher100",
+ "settings_intended": [
+  "T"
+ ],
+ "arms": {
+  "T": "mix11 (A3 plus a 1:1 replay of weak S3 windows from the other 649 training chapters)"
+ },
+ "replay": {
+  "weak_build": "20261003-weak_v2",
+  "setting": "S3",
+  "ratio": 1,
+  "exclude_teacher_chapters": true,
+  "rule": "every epoch: all teacher windows (the 100 chapters, setting T of 20261004-teacher100) plus ratio x as many weak S3 windows of 20261003-weak_v2, sampled without replacement by random.Random(seed) from the 649 training chapters that are not teacher chapters, shuffled together; each window keeps its own allowed label sets (partial-label NLL over both sources); steps per epoch = ceil((1 + ratio) x teacher windows / batch_size); warmup, linear decay, eval cadence, patience, checkpoint rule and sufficiency record as tagger.fit (novel_ner.finetune)"
+ },
+ "trainer": "novel_ner.finetune",
+ "init_from_run": "runs/20261003-tag-S3-s{seed}-dev31",
+ "init_from_run_note": "'{seed}' is filled with --seed; the named run must be finished (metrics.json, checkpoints/best) and use the same backbone id",
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 3e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "grad_accumulation": 1,
+ "max_epochs": 40,
+ "eval_every": 2.0,
+ "patience": 6,
+ "planned_steps_note": "ceil((1 + 1) x 500 teacher windows / 16) = 63 steps per epoch x 40 epochs = 2520 planned steps (A3: 32 x 40 = 1280); eval every 2 epochs = 126 steps; patience 6 evaluations = 12 epochs",
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

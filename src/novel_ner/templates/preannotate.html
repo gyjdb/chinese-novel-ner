@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小模型初标</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #1f2328; --muted: #667085; --line: #e3e1da;
+  --accent: #2f5bd3; --warn: #b42318; --ok: #067647; --flag: #d97706; --flash: #ffb4a6;
+  --miss: rgba(217, 119, 6, .16);
+  --person: #dbe7ff; --person-ink: #1d4ed8;
+  --organization: #ebe3ff; --organization-ink: #6d28d9;
+  --location: #d6f3e0; --location-ink: #15803d;
+  --dungeon: #ffe1dc; --dungeon-ink: #c2410c;
+  --item: #fff0c4; --item-ink: #a16207;
+  --trait: #d3f2f6; --trait-ink: #0e7490;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171c; --panel: #1d2027; --ink: #e6e8ec; --muted: #9aa3b2; --line: #2d323c;
+    --accent: #7aa2ff; --warn: #ff8a7a; --ok: #6fd39b; --flag: #fbbf24; --flash: #7a3326;
+    --miss: rgba(251, 191, 36, .16);
+    --person: #1f3358; --person-ink: #a5c4ff;
+    --organization: #33285a; --organization-ink: #cbb8ff;
+    --location: #173d29; --location-ink: #93e2b0;
+    --dungeon: #4a2621; --dungeon-ink: #ffb4a2;
+    --item: #43391a; --item-ink: #f3d27a;
+    --trait: #163d44; --trait-ink: #91e4ef;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); display: flex; flex-direction: column;
+  font: 14px/1.6 system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+header {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--panel);
+}
+header h1 { font-size: 15px; margin: 0; }
+header .grow { flex: 1; }
+main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 400px; }
+#reader { overflow: auto; padding: 20px 28px 120px; }
+#reader .inner { max-width: 46em; margin: 0 auto; }
+#reader h2 { font-size: 18px; margin: 0 0 4px; }
+.sub { color: var(--muted); font-size: 12.5px; margin-bottom: 16px; }
+.para { font-size: 18px; line-height: 2.25; margin: 0 0 .7em; }
+.bx { padding: 3px 0; cursor: pointer; }
+.t-person { background: var(--person); }
+.t-organization { background: var(--organization); }
+.t-location { background: var(--location); }
+.t-dungeon { background: var(--dungeon); }
+.t-item { background: var(--item); }
+.t-trait { background: var(--trait); }
+.b-s { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.b-e { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.fl { border-top: 1.5px dashed var(--flag); border-bottom: 1.5px dashed var(--flag); padding: 2px 0; }
+.fl.b-s { border-left: 1.5px dashed var(--flag); }
+.fl.b-e { border-right: 1.5px dashed var(--flag); }
+.dim { opacity: .35; }
+.ms { background-image: repeating-linear-gradient(135deg, var(--miss) 0 4px, transparent 4px 8px); cursor: pointer;
+      box-shadow: inset 0 -2px 0 var(--flag); }
+.g { text-decoration-line: underline; text-decoration-thickness: 2.5px; text-underline-offset: 7px; cursor: pointer; }
+.g-ok { text-decoration-color: var(--ok); }
+.g-bad { text-decoration-color: var(--warn); text-decoration-style: wavy; }
+.us { color: var(--muted); }
+.sel { box-shadow: inset 0 -3px 0 var(--accent); }
+.flash { background: var(--flash) !important; }
+sup.tag { font-size: 11px; margin: 0 4px 0 1px; cursor: pointer; white-space: nowrap; }
+sup.tag .fg { color: var(--flag); }
+sup.tag .x { color: var(--warn); font-weight: 600; }
+.k-person { color: var(--person-ink); }
+.k-organization { color: var(--organization-ink); }
+.k-location { color: var(--location-ink); }
+.k-dungeon { color: var(--dungeon-ink); }
+.k-item { color: var(--item-ink); }
+.k-trait { color: var(--trait-ink); }
+#side { overflow: auto; border-left: 1px solid var(--line); padding: 10px 12px 80px; background: var(--panel); }
+.card { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+.card h3 { margin: 0 0 6px; font-size: 14px; }
+.card h4 { margin: 10px 0 4px; font-size: 13px; }
+.muted { color: var(--muted); font-size: 12.5px; }
+.warn { color: var(--warn); }
+.ok { color: var(--ok); }
+.row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+button, select {
+  font: inherit; font-size: 13px; padding: 4px 9px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--bg); color: var(--ink); cursor: pointer;
+}
+button:hover:not(:disabled), select:hover { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+select { max-width: 100%; }
+.chip { display: inline-block; font-size: 11.5px; padding: 0 6px; border-radius: 10px; border: 1px solid var(--line); margin: 1px 2px 1px 0; white-space: nowrap; }
+.chip.fl { border: 1px solid var(--flag); color: var(--flag); padding: 0 6px; }
+.chip.ty { border: none; }
+.grp { display: block; width: 100%; text-align: left; border: none; border-top: 1px solid var(--line); border-radius: 0; background: none; padding: 6px 2px; }
+.grp:hover { background: var(--bg); }
+.grp b { font-size: 15px; font-weight: 600; margin-right: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+td { padding: 2px 4px; border-top: 1px solid var(--line); vertical-align: top; }
+td.n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.legend span.sw { display: inline-block; min-width: 2.2em; text-align: center; margin-right: 6px; border-radius: 4px; padding: 0 3px; }
+details summary { cursor: pointer; font-weight: 600; font-size: 13px; }
+ul.flags { margin: 4px 0; padding-left: 1.2em; }
+ul.flags li { margin: 2px 0; }
+#detail { position: sticky; top: -10px; z-index: 2; background: var(--panel); max-height: 48vh; overflow: auto;
+          box-shadow: 0 6px 12px -8px rgba(0, 0, 0, .35); }
+@media (max-width: 1000px) {
+  html, body { height: auto; }
+  main { display: block; }
+  #reader, #side { overflow: visible; }
+  #side { border-left: none; border-top: 1px solid var(--line); padding: 10px 16px 60px; }
+  #reader { padding: 16px 16px 40px; }
+  #detail { top: 0; }
+  .para { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>小模型初标</h1>
+  <select id="chapter" aria-label="选章"></select>
+  <button id="prev" title="上一章">‹</button><button id="next" title="下一章">›</button>
+  <span class="grow"></span>
+  <button id="gold" title="在正文下面画出已有答案（只读）">显示已有答案</button>
+  <button id="onlyfl" title="没挂旗的框变淡">只看挂旗的</button>
+</header>
+<main>
+  <section id="reader"><div class="inner"><h2 id="title"></h2><div class="sub" id="subtitle"></div><div id="text"></div></div></section>
+  <aside id="side"></aside>
+</main>
+<script>
+const DATA = /*__DATA__*/;
+const TYPE_ZH = DATA.type_zh, FLAG_ZH = DATA.flag_zh;
+const SHORT = {person: '人', organization: '组', location: '地', dungeon: '副', item: '物', trait: '特'};
+const KIND_ZH = {showcase: '示范章：考卷章，有已有答案', new: '新章：第 990 章以后，没有答案', test: '考卷章：有已有答案'};
+const EXPLAIN = {
+  seeds: '同一套设置训了三次（三个随机种子），这里三次的输出不完全一样。',
+  low: `模型对这个框的把握低于 ${DATA.low_score}（框里最没把握的那个字的概率）。`,
+  new: `这串字不在已有的词典和 Opus 名单里（考卷章看第 ${DATA.seen_cutoff.test} 章以前，新章看第 ${DATA.seen_cutoff.new} 章以前），是模型自己找出来的，要靠书里的知识确认。`,
+  nonperson: '不是人物。模型在人物以外的类型上错得多（考卷上人物 F1 约 0.95，人物以外约 0.65）。',
+  title: '名字后面紧跟称谓（或框里带着称谓）。规则 B1 一般只框名字；但固定称呼（例如“冬先生”）整串是名字，要知道是哪一种。',
+  mixed: '同一串字在本章被标成了不同类型。',
+  repeat: '这串字在本章别处被标成名字，这里却没标。',
+  minority: '三次训练里只有一次在这里标了名字。',
+  dictionary: '词典里有这个名字，模型在这里没标。',
+};
+const GOLD_ZH = {ok: '和已有答案一致', type: '位置一样、类型不同', boundary: '和已有答案重叠、边界不同', extra: '已有答案里这里不是名字', unscored: '碰到不计分的地方'};
+const GSTAT_ZH = {found: '模型标对了', type: '模型标了、类型不同', boundary: '模型标了、边界不同', missed: '模型没标'};
+
+let cur = 0, showGold = false, onlyFl = false, selected = null, cycle = {};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const pct = x => x == null ? '—' : (100 * x).toFixed(1) + '%';
+const ov = (a, b) => a[0] < b[1] && b[0] < a[1];
+
+function chapterText(ch) { return ch.paragraphs.map(p => p[1]).join('\n'); }
+
+function analyse(ch) {
+  // per box / per answer comparison with the existing answers (only when the chapter has them)
+  const res = {boxStatus: [], goldStatus: []};
+  if (!ch.gold) return res;
+  const goldKey = new Set(ch.gold.map(g => g.join('|')));
+  const touchU = sp => ch.unscored.some(u => ov(sp, u));
+  ch.boxes.forEach(b => {
+    const sp = [b.s, b.e];
+    if (touchU(sp)) res.boxStatus.push('unscored');
+    else if (goldKey.has([b.s, b.e, b.t].join('|'))) res.boxStatus.push('ok');
+    else if (ch.gold.some(g => g[0] === b.s && g[1] === b.e)) res.boxStatus.push('type');
+    else if (ch.gold.some(g => ov(sp, g))) res.boxStatus.push('boundary');
+    else res.boxStatus.push('extra');
+  });
+  const boxKey = new Set(ch.boxes.map(b => [b.s, b.e, b.t].join('|')));
+  ch.gold.forEach(g => {
+    if (touchU(g)) res.goldStatus.push('unscored');
+    else if (boxKey.has(g.join('|'))) res.goldStatus.push('found');
+    else if (ch.boxes.some(b => b.s === g[0] && b.e === g[1])) res.goldStatus.push('type');
+    else if (ch.boxes.some(b => ov([b.s, b.e], g))) res.goldStatus.push('boundary');
+    else res.goldStatus.push('missed');
+  });
+  return res;
+}
+
+function fillSelect() {
+  const sel = $('chapter');
+  const groups = [['showcase', '示范章（已有答案）'], ['new', '新章 991 以后（没有答案）'], ['test', '其余考卷章（已有答案）']];
+  sel.innerHTML = groups.map(([k, label]) => `<optgroup label="${label}">` + DATA.chapters.map((ch, i) => ch.kind !== k ? '' :
+    `<option value="${i}">第 ${ch.number} 章 ${esc(ch.title || '')}</option>`).join('') + '</optgroup>').join('');
+  sel.onchange = () => go(+sel.value);
+}
+
+function go(i) {
+  cur = Math.max(0, Math.min(DATA.chapters.length - 1, i));
+  selected = null; cycle = {};
+  $('chapter').value = cur;
+  render();
+  $('reader').scrollTop = 0;
+  $('side').scrollTop = 0;
+}
+
+function render() {
+  const ch = DATA.chapters[cur], text = chapterText(ch), n = text.length, a = analyse(ch);
+  $('title').textContent = `第 ${ch.number} 章 ${ch.title || ''}`;
+  $('subtitle').textContent = KIND_ZH[ch.kind] + `　·　${ch.chapter_id}　·　${n} 字`;
+  $('gold').disabled = !ch.gold;
+  $('gold').classList.toggle('on', showGold && !!ch.gold);
+  $('onlyfl').classList.toggle('on', onlyFl);
+  const boxAt = new Int32Array(n).fill(-1), goldAt = new Int32Array(n).fill(-1), missAt = new Int32Array(n).fill(-1);
+  const unsc = new Uint8Array(n);
+  ch.boxes.forEach((b, i) => { for (let k = b.s; k < b.e; k++) boxAt[k] = i; });
+  // nested candidates: each character shows the shortest candidate on it, so an inner one stays clickable
+  ch.misses.forEach((m, i) => { for (let k = m.s; k < m.e; k++) {
+    const o = missAt[k];
+    if (o < 0 || m.e - m.s < ch.misses[o].e - ch.misses[o].s) missAt[k] = i;
+  } });
+  const selRange = selectedRange(ch);
+  const inSel = k => !!selRange && k >= selRange[0] && k < selRange[1];
+  let anchored = false;
+  if (ch.gold && showGold) {
+    ch.gold.forEach((g, i) => { for (let k = g[0]; k < g[1]; k++) goldAt[k] = i; });
+    ch.unscored.forEach(u => { for (let k = u[0]; k < u[1]; k++) unsc[k] = 1; });
+  }
+  let html = '', base = 0;
+  ch.paragraphs.forEach(([pid, ptext]) => {
+    let out = '', k = base;
+    const end = base + ptext.length;
+    while (k < end) {
+      const bi = boxAt[k], gi = goldAt[k], mi = bi < 0 ? missAt[k] : -1, u = unsc[k];
+      let j = k + 1;
+      while (j < end && boxAt[j] === bi && goldAt[j] === gi && (bi < 0 ? missAt[j] : -1) === mi && unsc[j] === u
+             && inSel(j) === inSel(k)) j++;
+      const cls = [], attrs = [];
+      if (inSel(k)) {
+        cls.push('sel');
+        if (!anchored) { attrs.push('id="anchor"'); anchored = true; }
+      }
+      if (bi >= 0) {
+        const b = ch.boxes[bi];
+        cls.push('bx', 't-' + b.t);
+        if (k === b.s) cls.push('b-s');
+        if (j === b.e) cls.push('b-e');
+        if (b.flags.length) cls.push('fl');
+        if (onlyFl && !b.flags.length) cls.push('dim');
+        attrs.push(`data-box="${bi}"`);
+      } else if (mi >= 0) {
+        cls.push('ms');
+        attrs.push(`data-miss="${mi}"`);
+      }
+      if (gi >= 0) {
+        cls.push('g', a.goldStatus[gi] === 'found' ? 'g-ok' : (a.goldStatus[gi] === 'unscored' ? '' : 'g-bad'));
+        if (bi < 0 && mi < 0) attrs.push(`data-gold="${gi}"`);
+      }
+      if (u) cls.push('us');
+      out += `<span class="${cls.join(' ')}" ${attrs.join(' ')} data-at="${k}">${esc(text.slice(k, j))}</span>`;
+      if (bi >= 0 && j === ch.boxes[bi].e) {
+        const b = ch.boxes[bi];
+        const bad = showGold && ch.gold && !['ok', 'unscored'].includes(a.boxStatus[bi]);
+        out += `<sup class="tag k-${b.t}${onlyFl && !b.flags.length ? ' dim' : ''}" data-box="${bi}">${SHORT[b.t]}` +
+               (b.flags.length ? '<span class="fg">⚑</span>' : '') + (bad ? '<span class="x">✗</span>' : '') + '</sup>';
+      }
+      k = j;
+    }
+    html += `<p class="para" data-pid="${pid}">${out || '&nbsp;'}</p>`;
+    base = end + 1;
+  });
+  $('text').innerHTML = html;
+  renderSide(ch, a);
+}
+
+function selectedRange(ch) {
+  if (!selected) return null;
+  if (selected.kind === 'box') return [ch.boxes[selected.i].s, ch.boxes[selected.i].e];
+  if (selected.kind === 'miss') return [ch.misses[selected.i].s, ch.misses[selected.i].e];
+  return [ch.gold[selected.i][0], ch.gold[selected.i][1]];
+}
+
+function typeChip(t, extra = '') { return `<span class="chip ty t-${t} k-${t}">${TYPE_ZH[t]}${extra}</span>`; }
+function flagChips(fs) { return fs.map(f => `<span class="chip fl">${FLAG_ZH[f]}</span>`).join(''); }
+
+function renderSide(ch, a) {
+  const byType = {};
+  ch.boxes.forEach(b => byType[b.t] = (byType[b.t] || 0) + 1);
+  const flagged = ch.boxes.filter(b => b.flags.length).length;
+  const three = ch.boxes.filter(b => b.seeds.length === 3).length;
+  let h = `<div class="card" id="detail"><h3>选中的地方</h3>${detailHtml(ch, a)}</div>`;
+  h += `<div class="card"><h3>这一章模型标了什么</h3>
+    <div>框 <b>${ch.boxes.length}</b> 个：${Object.entries(byType).sort((x, y) => y[1] - x[1]).map(([t, c]) => typeChip(t, ' ' + c)).join('')}</div>
+    <div class="muted">框 = 三次训练里至少两次一模一样的输出；三次都一样的 ${three} 个。</div>
+    <div>挂旗（要看一眼）<b>${flagged}</b> 个；可能漏标 <b>${ch.misses.length}</b> 处。</div></div>`;
+  if (ch.gold) {
+    const c = s => a.boxStatus.filter(x => x === s).length, g = s => a.goldStatus.filter(x => x === s).length;
+    const fb = ch.boxes.map((b, i) => [b, a.boxStatus[i]]).filter(([, s]) => s !== 'unscored');
+    const flW = fb.filter(([b, s]) => b.flags.length && s !== 'ok').length, flN = fb.filter(([b]) => b.flags.length).length;
+    const unW = fb.filter(([b, s]) => !b.flags.length && s !== 'ok').length, unN = fb.filter(([b]) => !b.flags.length).length;
+    const missed = a.goldStatus.filter(s => s !== 'found' && s !== 'unscored').length;
+    h += `<div class="card"><h3>和已有答案对照 <span class="muted">（答案只读，没改）</span></h3>
+      <table>
+      <tr><td>模型的框和答案一模一样</td><td class="n ok">${c('ok')}</td></tr>
+      <tr><td>位置一样、类型不同</td><td class="n warn">${c('type')}</td></tr>
+      <tr><td>和答案重叠、边界不同</td><td class="n warn">${c('boundary')}</td></tr>
+      <tr><td>答案里这里不是名字（多标）</td><td class="n warn">${c('extra')}</td></tr>
+      <tr><td>答案里有、模型没框对（漏标，含边界或类型不同）</td><td class="n warn">${missed}</td></tr>
+      <tr><td class="muted">其中模型完全没碰到</td><td class="n muted">${g('missed')}</td></tr>
+      </table>
+      <div class="row muted">挂旗的框里和答案不一致：${flW}/${flN}；没挂旗的框里：${unW}/${unN}。</div>
+      <div class="row"><button id="gold2" class="${showGold ? 'on' : ''}">${showGold ? '隐藏' : '在正文里显示'}已有答案</button></div>
+      <div class="muted">打开后：答案画在字下面，<span class="ok">绿线</span> = 模型框对了，<span class="warn">红波浪线</span> = 模型没框对；模型的框不对的，类型字后面有 <span class="warn">✗</span>。</div></div>`;
+  }
+  const ask = ch.groups.filter(g => g.ask_user), rev = ch.groups.filter(g => !g.ask_user);
+  const grpRow = (g, gi) => {
+    const types = Object.entries(g.types).map(([t, c]) => typeChip(t, ' ' + c)).join('');
+    const total = g.boxes.length + g.misses.length;
+    return `<button class="grp" data-grp="${gi}"><b>${esc(g.text)}</b>${types || '<span class="chip">模型没标</span>'}
+      <span class="muted">${total} 处</span><br>${flagChips(g.flags)}</button>`;
+  };
+  h += `<div class="card"><h3>要检查的地方（按名字归组）</h3>
+    <div class="muted">点一下跳到原文，再点跳到下一处。</div>
+    <h4>问你：书里的知识（${ask.length} 组）</h4>
+    <div class="muted">没见过的名字、名字后跟称谓：只需用白话说它是什么。</div>
+    ${ask.map(g => grpRow(g, ch.groups.indexOf(g))).join('') || '<div class="muted">没有。</div>'}
+    <h4>交给复核模型：按规则判（${rev.length} 组）</h4>
+    <div class="muted">模型拿不准、类型容易错、可能漏标的地方；不需要书外知识。</div>
+    ${rev.map(g => grpRow(g, ch.groups.indexOf(g))).join('') || '<div class="muted">没有。</div>'}</div>`;
+  h += legendHtml();
+  const keep = $('side').scrollTop;
+  $('side').innerHTML = h;
+  $('side').scrollTop = keep;
+  const g2 = $('gold2');
+  if (g2) g2.onclick = toggleGold;
+  document.querySelectorAll('.grp').forEach(el => el.onclick = () => jumpGroup(+el.dataset.grp));
+  document.querySelectorAll('[data-sel-miss]').forEach(el => el.onclick = () => select('miss', +el.dataset.selMiss, true));
+}
+
+function seedLine(ch, sp) {
+  return ch.seeds.map((spans, i) => {
+    const hit = spans.filter(x => ov([x[0], x[1]], sp));
+    const text = chapterText(ch);
+    return `<div>第 ${i + 1} 次训练：${hit.length ? hit.map(x => `「${esc(text.slice(x[0], x[1]))}」${TYPE_ZH[x[2]]}（${x[3].toFixed(3)}）`).join('、') : '<span class="muted">没标</span>'}</div>`;
+  }).join('');
+}
+
+function detailHtml(ch, a) {
+  if (!selected) return '<div class="muted">点正文里的框、斜纹或下划线，这里显示三次训练各标了什么、为什么挂旗。</div>';
+  const text = chapterText(ch);
+  if (selected.kind === 'box') {
+    const b = ch.boxes[selected.i];
+    let h = `<div><b style="font-size:16px">${esc(text.slice(b.s, b.e))}</b> ${typeChip(b.t)} <span class="muted">把握 ${b.score.toFixed(3)} · ${b.seeds.length}/3 次训练一样</span></div>`;
+    h += seedLine(ch, [b.s, b.e]);
+    if (b.flags.length) h += `<ul class="flags">${b.flags.map(f => `<li><span class="chip fl">${FLAG_ZH[f]}</span>${EXPLAIN[f]}${f === 'title' && b.title_word ? `（这里是“${esc(b.title_word)}”）` : ''}</li>`).join('')}</ul>`;
+    else h += '<div class="muted">没挂旗：三次训练一样、有把握、见过的人物名。</div>';
+    if (ch.gold) {
+      const st = a.boxStatus[selected.i];
+      const near = ch.gold.filter(g => ov([b.s, b.e], g)).map(g => `「${esc(text.slice(g[0], g[1]))}」${TYPE_ZH[g[2]]}`).join('、');
+      h += `<div class="${st === 'ok' ? 'ok' : 'warn'}">已有答案：${GOLD_ZH[st]}${near && st !== 'ok' ? '（答案：' + near + '）' : ''}</div>`;
+    }
+    return h;
+  }
+  if (selected.kind === 'miss') {
+    const m = ch.misses[selected.i];
+    let h = `<div><b style="font-size:16px">${esc(text.slice(m.s, m.e))}</b> <span class="muted">可能漏标</span>${m.types.map(t => typeChip(t, '?')).join('')}</div>`;
+    h += `<ul class="flags">${m.kinds.map(k => `<li><span class="chip fl">${FLAG_ZH[k]}</span>${EXPLAIN[k]}</li>`).join('')}</ul>`;
+    const others = ch.misses.map((o, k) => [o, k]).filter(([o, k]) => k !== selected.i && ov([o.s, o.e], [m.s, m.e]));
+    if (others.length) h += `<div class="row muted">和它重叠的其他提示：${others.map(([o, k]) =>
+      `<button data-sel-miss="${k}">${esc(text.slice(o.s, o.e))}</button>`).join('')}</div>`;
+    h += seedLine(ch, [m.s, m.e]);
+    if (ch.gold) {
+      const near = ch.gold.filter(g => ov([m.s, m.e], g)).map(g => `「${esc(text.slice(g[0], g[1]))}」${TYPE_ZH[g[2]]}`).join('、');
+      const unscored = ch.unscored.some(u => ov([m.s, m.e], u));
+      h += unscored ? `<div class="muted">已有答案：碰到不计分的地方（待审或定为不计分）${near ? '；旁边有 ' + near : ''}</div>`
+                    : `<div class="${near ? 'warn' : 'ok'}">已有答案：${near ? '这里有 ' + near : '这里不是名字'}</div>`;
+    }
+    return h;
+  }
+  const g = ch.gold[selected.i];
+  return `<div><b style="font-size:16px">${esc(text.slice(g[0], g[1]))}</b> ${typeChip(g[2])} <span class="muted">已有答案</span></div>
+    <div class="warn">${GSTAT_ZH[a.goldStatus[selected.i]] || ''}</div>${seedLine(ch, [g[0], g[1]])}`;
+}
+
+function legendHtml() {
+  const r = DATA.test_summary.rates, c = DATA.test_summary.counts;
+  const pf = Object.entries(r.per_flag).map(([f, x]) => `<tr><td>${FLAG_ZH[f]}</td><td class="n">${x.boxes}</td><td class="n">${pct(x.wrong_share)}</td></tr>`).join('');
+  const pk = Object.entries(r.per_candidate_kind).map(([k, x]) => `<tr><td>${FLAG_ZH[k]}</td><td class="n">${x.candidates}</td><td class="n">${pct(x.share)}</td></tr>`).join('');
+  return `<div class="card legend"><h3>怎么看</h3>
+    <div class="row">${Object.keys(SHORT).map(t => `<span class="sw t-${t} k-${t}">${SHORT[t]}</span>${TYPE_ZH[t]}`).join(' ')}</div>
+    <div class="row"><span class="sw bx t-person fl b-s b-e">徐获</span>橙色虚线框 + ⚑ = 挂旗，要看一眼</div>
+    <div class="row"><span class="sw ms">某某</span>橙色斜纹 = 可能漏标（模型没框）</div>
+    <div class="muted">框的颜色 = 模型给的类型；类型字是上标。模型是弱监督 S3（只训到第 780 章、只看正文），三个种子：${DATA.model_runs.map(esc).join('、')}。</div></div>
+    <div class="card"><details><summary>这些旗靠不靠谱：在考卷 ${DATA.test_summary.chapters} 章上量的（事后）</summary>
+    <p class="muted">挂旗规则先写进配置并提交，再在考卷章上算；但规则是看过这些章的错误分析之后写的，所以下面的数偏乐观，只是描述。答案是银标准第三版。</p>
+    <table>
+      <tr><td>框（三次里至少两次一样）的严格 P / R / F1</td><td class="n">${r.shown_boxes_strict.precision} / ${r.shown_boxes_strict.recall} / ${r.shown_boxes_strict.f1}</td></tr>
+      <tr><td>挂旗的框占全部框</td><td class="n">${pct(r.flagged_share_of_boxes)}</td></tr>
+      <tr><td>挂旗的框里和答案不一致的</td><td class="n">${pct(r.wrong_share_among_flagged)}</td></tr>
+      <tr><td>没挂旗的框里和答案不一致的</td><td class="n">${pct(r.wrong_share_among_unflagged)}</td></tr>
+      <tr><td>不一致的框里有旗的</td><td class="n">${pct(r.wrong_boxes_flagged_share)}</td></tr>
+      <tr><td>答案里模型没框对的，被旗或漏标提示碰到的</td><td class="n">${pct(r.missed_answers_caught_share)}</td></tr>
+      <tr><td>“可能漏标”提示真碰到漏掉的答案</td><td class="n">${pct(r.candidates_on_missed_answer_share)}</td></tr>
+      <tr><td>就算挂旗处全查对，60 章还剩的错</td><td class="n">${r.left_after_a_perfect_review_of_flags.wrong_unflagged_boxes} 个错框 + ${r.left_after_a_perfect_review_of_flags.missed_answers_not_caught} 处漏标</td></tr>
+    </table>
+    <h4>每种旗</h4><table><tr><td></td><td class="n">框数</td><td class="n">其中不一致</td></tr>${pf}</table>
+    <h4>每种漏标提示</h4><table><tr><td></td><td class="n">处数</td><td class="n">碰到漏掉的答案</td></tr>${pk}</table>
+    </details></div>
+    <div class="card muted">生成：${esc(DATA.generated_at)} · ${esc(DATA.run_id)} · 代码 ${esc((DATA.code.commit || '').slice(0, 10))}${DATA.code.dirty ? '（有未提交改动）' : ''} · 快照 ${esc(DATA.snapshots.test)} / ${esc(DATA.snapshots.new)}。本页含正文，只在本机打开，不发布。</div>`;
+}
+
+function toggleGold() { showGold = !showGold; render(); }
+
+function select(kind, i, scroll) {
+  selected = {kind, i};
+  render();
+  const el = document.getElementById('anchor');
+  if (el && scroll) {
+    el.scrollIntoView({block: 'center', behavior: 'smooth'});
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 900);
+  }
+}
+
+function jumpGroup(gi) {
+  const ch = DATA.chapters[cur], g = ch.groups[gi];
+  const places = [...g.boxes.map(p => ['box', p]), ...g.misses.map(p => ['miss', p])].sort((x, y) => x[1][0] - y[1][0]);
+  const k = (cycle[gi] || 0) % places.length;
+  cycle[gi] = k + 1;
+  const [kind, [s, e]] = places[k];
+  const list = kind === 'box' ? ch.boxes : ch.misses;
+  select(kind, list.findIndex(x => x.s === s && x.e === e), true);
+}
+
+$('text').addEventListener('click', ev => {
+  const el = ev.target.closest('[data-box],[data-miss],[data-gold]');
+  if (!el) return;
+  if (el.dataset.box !== undefined) select('box', +el.dataset.box);
+  else if (el.dataset.miss !== undefined) select('miss', +el.dataset.miss);
+  else select('gold', +el.dataset.gold);
+});
+$('gold').onclick = toggleGold;
+$('onlyfl').onclick = () => { onlyFl = !onlyFl; render(); };
+$('prev').onclick = () => go(cur - 1);
+$('next').onclick = () => go(cur + 1);
+document.addEventListener('keydown', ev => {
+  if (ev.target.tagName === 'SELECT') return;
+  if (ev.key === 'ArrowLeft') go(cur - 1);
+  if (ev.key === 'ArrowRight') go(cur + 1);
+});
+fillSelect();
+go(0);
+</script>
+</body>
+</html>

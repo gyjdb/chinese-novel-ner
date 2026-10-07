@@ -1,0 +1,61 @@
+{
+ "description": "Seed-aware paired intervals and new-name breakdowns of the stage 3 final scoring of test2 (configs/eval_test2_final.json; eval_run below must be that scoring run, scored with --run-id 20261004-eval-test2-final; this run's id is 20261004-posthoc-test2-final). Fixed and committed together with the scoring config before the seal was opened; nothing here is changed after the scores are seen. A: the second interval kind the stage 3 report rules require ('chapters and seeds redrawn together'), for exactly the six pairs of configs/stage3_final.json, each written [later, earlier] and reported as later minus earlier: A3-A2 (the final model against the lower-cost control), opus-A3 and sonnet-A3 (the generative models against the final model), opus-sonnet, A3-S3 and A2-S3 (each against the weak-label-only reference); opus and sonnet are single-run models, so there is no run draw on their side. The chapter-only level must reproduce the scoring run's stored pooled intervals exactly (same rounds and chapter_seed; the pairs are stored the same way round); run_seed 20261003 is kept from posthoc_v10 and posthoc_dev2_v1 (any fixed number would do). B, C, D as posthoc_dev2_v1 (descriptive); E is empty: test2 has no learning-curve tiers. The scoring run scored a later export: training_snapshot to0990-79dc77f8d354 for the trained systems, the weak builds, the training text of C, the dictionary system's dictionary and the seen names of the fixed rule; snapshot to1350-4c4b1c91075e for the answers and the text. This run loads both, checks the lineage the scoring run recorded (snapshots) and takes each piece from the snapshot the scoring run took it from. The module's POST HOC banner describes where these analyses came from (chosen after v10); for test2 the intervals of A are part of the pre-set report rules, not chosen after seeing the scores. Nobody judges whether an answer is right.",
+ "eval_run": "runs/20261004-eval-test2-final",
+ "new_names": {
+  "cutoff_chapter": 780
+ },
+ "title_suffixes_from": "configs/weak_v2.json",
+ "bootstrap": {
+  "rounds": 10000,
+  "chapter_seed": 20261002,
+  "run_seed": 20261003
+ },
+ "pairs": [
+  [
+   "A3",
+   "A2"
+  ],
+  [
+   "opus",
+   "A3"
+  ],
+  [
+   "sonnet",
+   "A3"
+  ],
+  [
+   "opus",
+   "sonnet"
+  ],
+  [
+   "A3",
+   "S3"
+  ],
+  [
+   "A2",
+   "S3"
+  ]
+ ],
+ "frequency_bands": [
+  {
+   "label": "10_or_more",
+   "min": 10,
+   "max": null
+  },
+  {
+   "label": "2_to_9",
+   "min": 2,
+   "max": 9
+  },
+  {
+   "label": "1",
+   "min": 1,
+   "max": 1
+  }
+ ],
+ "concentration": {
+  "top_n": 10,
+  "frequent_min_spans": 10
+ },
+ "tiers": {}
+}

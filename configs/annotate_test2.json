@@ -1,0 +1,8 @@
+{
+ "description": "Annotation page for the second, sealed test (test2; 40 chapters): the first n chapters of the stratified 996-1350 order configs/test2_996_1350.order.json (n as sealed in configs/test2_seal.json). Each chapter arrives prefilled from two GPT passes (novel_ner.adjudicate --set test2); the annotator only settles the pending marks. The page reads the chapter text from snapshot to1350 (its chapters 1-990 are identical to to0990); making the answers is the one allowed use of these chapters while the seal holds.",
+ "set": "test2",
+ "snapshot": "to1350-4c4b1c91075e",
+ "guide_version": "1.1",
+ "chapters_from_order": "configs/test2_996_1350.order.json",
+ "n": 40
+}

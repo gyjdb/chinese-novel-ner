@@ -1,0 +1,45 @@
+{
+ "description": "Round 4 arm A3d: the round 3 recipe with the weak build replaced by 20261004-teacher100d (configs/consistency_v2.json: K5 removed, K6/K7/K8 as before). Same recipe, same seeds: only the labels differ. Round 3 arm A3c: exactly train_s1_base_a3.json (A3) with the weak build replaced by 20261004-teacher100c, the consistency-rule version of the same 100 chapters of teacher labels (configs/consistency_v1.json). Same recipe, same seeds: only the labels differ. Stage 1 arm A3: the base backbone first trained on the 749 training chapters' weak S3 labels (the existing, frozen S3 checkpoints runs/20261003-tag-S3-s<seed>-dev31, one per seed) and then fine-tuned on the 100 teacher chapters' Opus labels (setting T of weak build 20261004-teacher100), NEEDLE's two-stage recipe. init_from_run names the checkpoint to start from; '{seed}' is replaced by the run's seed, so seed 1 starts from the S3 seed-1 run, seed 2 from seed 2, and so on (the pairing is recorded in config.json as init_from, with that run's config.json sha256). The run refuses a checkpoint from another backbone id. Everything else (schedule, lr, batch, sufficiency record, checkpoint rule) is train_s1_base: about 1300 planned steps, dev every 2 epochs, patience 6; the sufficiency record shows whether fine-tuning from a trained model needed fewer steps. Intended setting: T only (A3 compares with A2 = T from the fresh backbone: does the weak pre-training still help once teacher labels exist?); W from an S3 checkpoint would re-train on the same label source and is not an arm. Three seeds. Nothing tuned on dev2 or the test.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261004-teacher100d",
+ "settings_intended": [
+  "T"
+ ],
+ "arms": {
+  "T": "A3d (labels with K7, K6, K8 and no K5; from the S3 checkpoints)"
+ },
+ "init_from_run": "runs/20261003-tag-S3-s{seed}-dev31",
+ "init_from_run_note": "'{seed}' is filled with --seed; the named run must be finished (metrics.json, checkpoints/best) and use the same backbone id",
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 3e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "grad_accumulation": 1,
+ "max_epochs": 40,
+ "eval_every": 2.0,
+ "patience": 6,
+ "planned_steps_note": "as train_s1_base: about 32 steps per epoch x 40 epochs = about 1300 steps",
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

@@ -1,0 +1,168 @@
+{
+ "description": "Stage 3: the one final scoring of the sealed test2 (configs/stage3_final.json; option 1, no more training or annotation this stage). Everything in this file was fixed and committed BEFORE the seal (configs/test2_seal.json) was opened; test2 is scored once with it (run id 20261004-eval-test2-final) and, whatever the result, it is reported as it is and the stage ends; a later change of method opens a new research stage with a new independent validation set, and test2 is thereafter only historical. Nothing was chosen on test2 and nothing is chosen on it here: every choice so far was made on dev2 (configs/eval_dev2_v1.json, data/gold/dev2/20261004-130201_guide-v1.1.json) or the 31 dev chapters; all three seeds of every trained system are reported (mean, range, pooled), no seed or checkpoint is picked by test2 scores. Systems: A3 = the final small model of this stage (base hfl/chinese-roberta-wwm-ext; stage 1 the weak S3 labels of the 749 training chapters, runs/20261003-tag-S3-s{seed}-dev31; stage 2 fine-tuned on the Opus teacher labels of 100 training chapters, build 20261004-teacher100, configs/train_s1_base_a3.json; runs 20261004-tag-T-s{1,2,3}-s1a3, each run's checkpoints/best chosen on the 31 dev chapters during training, never on test2); A2 = the lower-cost control, the same base trained directly on the 100 teacher chapters only (no 749-chapter weak stage; seed 2 is the 60-epoch re-run that replaced the run the sufficiency rule flagged, as on dev2); S3 = reference only, the weak-label-only system of the first round (749 chapters, no teacher labels); opus_f1 and sonnet_f1 = the generative comparison, claude-opus-5-5 and claude-sonnet-5-5 through claude -p, one call per 5-chapter package test2_b01..b08 (the GPT drafting packages; the model sees only the prompt files) under the drafting prompt (instructions v1 + guide v1.1 + text), effort xhigh, one run each (run ids 20261004-claude-opus-test2, 20261004-claude-sonnet-test2); gliner_zero_shot (threshold chosen on the dev chapters, as in every scoring run) and dictionary (the TRAINING snapshot to0990's 414-row dictionary matched in the test2 text; not the 517 rows of to1350, which hold information from chapters after 780) = the zero-training references. Inference: tagger predict on snapshot to1350-4c4b1c91075e (the models' own snapshot is to0990-79dc77f8d354; the two share every chapter 1-990 byte for byte, recorded by predict as snapshot_lineage and checked here through training_snapshot), default chunking paragraph500, no post-processing (no C1 chunking variants, no C2 vote, no seed vote), each seed scored separately and pooled; run ids <training run id>-predict-test2 (the id names test2, which the predict guard requires once the seal is open). Scoring (novel_ner.evaluate, as every scoring run): strict span+type matching, the answers' unscored ranges left out, micro F1 / precision / recall, non-person F1, six-type macro, new-name recall by the fixed rule (a scored answer is new when its exact text is unseen in the to0990 dictionary and the Opus lists of chapters <= 780), 10000 bootstrap rounds within the six strata r01-r06 of the order file (seed 20261002; the test chapters' strata come from the order file by chapter id), by-origin split post hoc; the seed-aware intervals come from configs/posthoc_test2_final.json (run id 20261004-posthoc-test2-final). Pairs: exactly the six of stage3_final.json, [A3, A2], [opus, A3], [sonnet, A3], [opus, sonnet], [A3, S3], [A2, S3]. Report rules: every pair with point, both interval kinds and width for micro F1, non-person F1 and new-name recall; no verdict words beyond 'both intervals above/below 0' or 'crosses 0'; A3's three seeds all reported (mean, range, pooled); the dev2 numbers quoted next to the test2 numbers so that the drop or rise between the decision set and the sealed set is visible; speed per chapter for every system; the generative systems' pending (abstention) counts; the test2 answers' origin split (GPT-agreed / user / reviewer) and the exclusion QA result; the 60-chapter test of the first round is not re-scored here (A3 was never run on it) and is reported only as history; nothing here is changed after the scores are seen. The silver standard of test2 (answers v2: v1 plus 天堂之梯 as location, the annotator's decision after the exclusion QA; 40 chapters of snapshot to1350) is GPT-6.1-Sol's two drafting passes under the frozen guide v1.1 and instructions v1 (the same drafter, instructions and api_prompt_v1 as the calibration run runs/20261001-api-calib-score, which calibration_metrics therefore still cites), the annotator's name answers and GPT-6-Astra's adjudication of the pending places; Opus and GPT read the same rules, so the scores contain a share of 'agreeing with the drafter's conventions' (by_gold_origin_post_hoc separates the places the annotator, the sheet or the reviewer decided).",
+ "snapshot": "to1350-4c4b1c91075e",
+ "training_snapshot": "to0990-79dc77f8d354",
+ "gold_test": "data/gold/test2/20261004-145049_guide-v1.1.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "test_order": "configs/test2_996_1350.order.json",
+ "calibration_metrics": "runs/20261001-api-calib-score/metrics.json",
+ "calibration_note": "runs/20261001-api-calib-score scored GPT's two blind drafts of dev chapters 57 and 46 against the annotator's own answers (gpt-6.1-sol, reasoning effort xhigh, api_prompt_v1, instructions v1): the same drafter and instructions that drafted test2, so gold_record cites it unchanged; no calibration was run on test2 chapters",
+ "gliner": {
+  "variant": {
+   "name": "char-perword-en",
+   "splitter": "char",
+   "space_mode": "per_word",
+   "labels": "en"
+  },
+  "labels": {
+   "person": "person",
+   "organization": "organization",
+   "location": "location",
+   "dungeon": "dungeon",
+   "item": "item",
+   "trait": "trait"
+  },
+  "chunk_max_chars": 200,
+  "batch_size": 16,
+  "save_threshold": 0.1,
+  "thresholds": [
+   0.3,
+   0.4,
+   0.5,
+   0.6,
+   0.7,
+   0.8,
+   0.85,
+   0.9,
+   0.93,
+   0.95
+  ]
+ },
+ "dictionary": {
+  "min_len": 2,
+  "from_training_snapshot": true
+ },
+ "bootstrap": {
+  "n": 10000,
+  "seed": 20261002
+ },
+ "llm_systems": [
+  {
+   "name": "opus_f1",
+   "label": "opus_f1",
+   "calls": "runs/20261004-claude-opus-test2/claude_calls.json",
+   "run_note": "single run: the generative comparison of stage 3 (claude-opus-5-5 through claude -p on the 8 test2 packages test2_b01..b08 under the exact drafting prompt, effort xhigh; run id 20261004-claude-opus-test2); run count fixed at 1 before the seal was opened"
+  },
+  {
+   "name": "sonnet_f1",
+   "label": "sonnet_f1",
+   "calls": "runs/20261004-claude-sonnet-test2/claude_calls.json",
+   "run_note": "single run: the generative comparison of stage 3 (claude-sonnet-5-5 through claude -p on the 8 test2 packages test2_b01..b08 under the exact drafting prompt, effort xhigh; run id 20261004-claude-sonnet-test2); run count fixed at 1 before the seal was opened"
+  }
+ ],
+ "models": {
+  "A3": [
+   "A3_s1",
+   "A3_s2",
+   "A3_s3"
+  ],
+  "A2": [
+   "A2_s1",
+   "A2_s2",
+   "A2_s3"
+  ],
+  "S3": [
+   "S3_s1",
+   "S3_s2",
+   "S3_s3"
+  ],
+  "opus": [
+   "opus_f1"
+  ],
+  "sonnet": [
+   "sonnet_f1"
+  ],
+  "gliner": [
+   "gliner_zero_shot"
+  ],
+  "dictionary_match": [
+   "dictionary"
+  ]
+ },
+ "pairs": [
+  [
+   "A3",
+   "A2"
+  ],
+  [
+   "opus",
+   "A3"
+  ],
+  [
+   "sonnet",
+   "A3"
+  ],
+  [
+   "opus",
+   "sonnet"
+  ],
+  [
+   "A3",
+   "S3"
+  ],
+  [
+   "A2",
+   "S3"
+  ]
+ ],
+ "span_systems": [
+  {
+   "name": "A3_s1",
+   "predictions_run": "runs/20261004-tag-T-s1-s1a3-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger initialised from the S3 checkpoint of the same seed (runs/20261003-tag-S3-s1-dev31: the 749 training chapters' weak S3 labels) and then fine-tuned on the Opus teacher labels (setting T: Opus under guide v1.1 and drafting instructions v1, its pending places and overlaps as no-loss regions) of the 100 teacher chapters of weak build 20261004-teacher100 (a stratified sample of chapters 1-780 minus the 31 dev chapters, seed 20261004); configs/train_s1_base_a3.json (schedule as train_s1_base.json); checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  },
+  {
+   "name": "A3_s2",
+   "predictions_run": "runs/20261004-tag-T-s2-s1a3-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger initialised from the S3 checkpoint of the same seed (runs/20261003-tag-S3-s2-dev31: the 749 training chapters' weak S3 labels) and then fine-tuned on the Opus teacher labels (setting T: Opus under guide v1.1 and drafting instructions v1, its pending places and overlaps as no-loss regions) of the 100 teacher chapters of weak build 20261004-teacher100 (a stratified sample of chapters 1-780 minus the 31 dev chapters, seed 20261004); configs/train_s1_base_a3.json (schedule as train_s1_base.json); checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  },
+  {
+   "name": "A3_s3",
+   "predictions_run": "runs/20261004-tag-T-s3-s1a3-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger initialised from the S3 checkpoint of the same seed (runs/20261003-tag-S3-s3-dev31: the 749 training chapters' weak S3 labels) and then fine-tuned on the Opus teacher labels (setting T: Opus under guide v1.1 and drafting instructions v1, its pending places and overlaps as no-loss regions) of the 100 teacher chapters of weak build 20261004-teacher100 (a stratified sample of chapters 1-780 minus the 31 dev chapters, seed 20261004); configs/train_s1_base_a3.json (schedule as train_s1_base.json); checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  },
+  {
+   "name": "A2_s1",
+   "predictions_run": "runs/20261004-tag-T-s1-s1base-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger trained on the Opus teacher labels (setting T: Opus under guide v1.1 and drafting instructions v1, its pending places and overlaps as no-loss regions) of the 100 teacher chapters of weak build 20261004-teacher100 (a stratified sample of chapters 1-780 minus the 31 dev chapters, seed 20261004); configs/train_s1_base.json (40 epochs, dev every 2 epochs, patience 6, lr 3e-5, batch 16); checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; the lower-cost control (no 749-chapter weak stage); predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  },
+  {
+   "name": "A2_s2",
+   "predictions_run": "runs/20261004-tag-T-s2-s1base-e60-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger trained on the Opus teacher labels (setting T: Opus under guide v1.1 and drafting instructions v1, its pending places and overlaps as no-loss regions) of the 100 teacher chapters of weak build 20261004-teacher100 (a stratified sample of chapters 1-780 minus the 31 dev chapters, seed 20261004); configs/train_s1_base_e60.json (60 epochs: the sufficiency re-run of the flagged 40-epoch seed-2 run, everything else as train_s1_base.json; it replaced the flagged run in A2 on dev2 and is kept here); checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; the lower-cost control (no 749-chapter weak stage); predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  },
+  {
+   "name": "A2_s3",
+   "predictions_run": "runs/20261004-tag-T-s3-s1base-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger trained on the Opus teacher labels (setting T: Opus under guide v1.1 and drafting instructions v1, its pending places and overlaps as no-loss regions) of the 100 teacher chapters of weak build 20261004-teacher100 (a stratified sample of chapters 1-780 minus the 31 dev chapters, seed 20261004); configs/train_s1_base.json (40 epochs, dev every 2 epochs, patience 6, lr 3e-5, batch 16); checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; the lower-cost control (no 749-chapter weak stage); predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  },
+  {
+   "name": "S3_s1",
+   "predictions_run": "runs/20261003-tag-S3-s1-dev31-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger trained on the weak S3 labels of all 749 training chapters (chapters 1-780 minus the 31 dev chapters, weak build 20261003-weak_v2); configs/train_v2.json; the same frozen training run as ws_S3 of scoring v10 and S3 of dev2, reference only; checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  },
+  {
+   "name": "S3_s2",
+   "predictions_run": "runs/20261003-tag-S3-s2-dev31-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger trained on the weak S3 labels of all 749 training chapters (chapters 1-780 minus the 31 dev chapters, weak build 20261003-weak_v2); configs/train_v2.json; the same frozen training run as ws_S3 of scoring v10 and S3 of dev2, reference only; checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  },
+  {
+   "name": "S3_s3",
+   "predictions_run": "runs/20261003-tag-S3-s3-dev31-predict-test2",
+   "input_condition": "(d) chapter text only at inference; hfl/chinese-roberta-wwm-ext (base, 12 layers) tagger trained on the weak S3 labels of all 749 training chapters (chapters 1-780 minus the 31 dev chapters, weak build 20261003-weak_v2); configs/train_v2.json; the same frozen training run as ws_S3 of scoring v10 and S3 of dev2, reference only; checkpoint chosen on the dev answers (31 chapters, data/gold/dev/20261003-134049), never on test2; predicted on the 40 test2 chapters read from snapshot to1350-4c4b1c91075e (the model's own snapshot to0990-79dc77f8d354, lineage recorded), default chunking paragraph500, no post-processing"
+  }
+ ],
+ "new_names": {
+  "cutoff_chapter": 780
+ }
+}

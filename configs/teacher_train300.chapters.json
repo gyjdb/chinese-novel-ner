@@ -1,0 +1,9013 @@
+{
+ "config": "teacher_train300.json",
+ "kind": "extension (novel_ner.teacher extend)",
+ "snapshot": "to0990-79dc77f8d354",
+ "code_commit": "566452d71cc10d7f9e2c2dab9b3f159ddb8c5b2e",
+ "code_dirty": true,
+ "base": {
+  "config": "configs/teacher_train100.json",
+  "chapters_file": "configs/teacher_train100.chapters.json",
+  "sha256": "3f990bc9583694911cec5ae00bb1090c82ca2a39d54944c9550e16de1c9e366d",
+  "labels_build": "20261004-teacher100",
+  "packs": [
+   "teach_b01",
+   "teach_b02",
+   "teach_b03",
+   "teach_b04",
+   "teach_b05",
+   "teach_b06",
+   "teach_b07",
+   "teach_b08",
+   "teach_b09",
+   "teach_b10",
+   "teach_b11",
+   "teach_b12",
+   "teach_b13",
+   "teach_b14",
+   "teach_b15",
+   "teach_b16",
+   "teach_b17",
+   "teach_b18",
+   "teach_b19",
+   "teach_b20"
+  ],
+  "chapters": 100
+ },
+ "pool": {
+  "chapters": 649,
+  "numbers": [
+   1,
+   780
+  ],
+  "max_train_chapter": 780,
+  "dev_chapters_excluded": 31,
+  "base_chapters_excluded": 100,
+  "rule": "chapters 1..780 of the snapshot minus the 31 dev chapters minus the 100 chapters of the base chapters file (649 chapters)"
+ },
+ "signals": {
+  "signal_a": {
+   "name": "non_person_weak_spans",
+   "rule": "number of positive spans whose type is not person in the weak S3 labels of the chapter (data/weak_labels/20261003-weak_v2/labels_S3.jsonl, split train; the record checks the file sha256 against runs/20261003-weak_v2/config.json). Pool spread when the rule was written: median 7, 90th percentile 20, max 39; the top 100 cut at 17.",
+   "source": {
+    "build": "20261003-weak_v2",
+    "setting": "S3",
+    "file": "data/weak_labels/20261003-weak_v2/labels_S3.jsonl",
+    "sha256": "cabe20f79fe7b212c1e770e46f3af8123d8e16179ad9f91377e4050a892b6de0",
+    "record": "runs/20261003-weak_v2/config.json",
+    "sha256_matches_record": true
+   },
+   "pool_spread": {
+    "median": 7,
+    "p90": 20,
+    "max": 39
+   }
+  },
+  "signal_b": {
+   "name": "student_uncertainty",
+   "rule": "the three A2 models (runs/20261004-tag-T-s1-s1base, runs/20261004-tag-T-s2-s1base-e60, runs/20261004-tag-T-s3-s1base; the stage 1 teacher-label arm) predict every pool chapter (ordinary predict runs on training chapters, run ids <model run>-predict-pool649); per chapter u = (spans of the three seeds union that not all three seeds predicted + spans all three predicted whose lowest seed score is below 0.9) / (spans in the union); a chapter with fewer than 10 union spans gets u = 0 (too few to rank). This is LLMaAA-style uncertainty sampling on training text only: no answer file, dev2, test or test2 is read.",
+   "low_score": 0.9,
+   "min_union_spans": 10,
+   "model_runs": [
+    "20261004-tag-T-s1-s1base",
+    "20261004-tag-T-s2-s1base-e60",
+    "20261004-tag-T-s3-s1base"
+   ],
+   "predict_run_suffix": "-predict-pool649",
+   "predict_runs": {
+    "20261004-tag-T-s1-s1base": {
+     "run_id": "20261004-tag-T-s1-s1base-predict-pool649",
+     "model_run": "20261004-tag-T-s1-s1base",
+     "predictions_sha256": "8e76d8e14e10aee7b341d004698ca59c7187e9d6b17cb2a60cf4f8119e76569f",
+     "outputs": 32611,
+     "reused": false
+    },
+    "20261004-tag-T-s2-s1base-e60": {
+     "run_id": "20261004-tag-T-s2-s1base-e60-predict-pool649",
+     "model_run": "20261004-tag-T-s2-s1base-e60",
+     "predictions_sha256": "7c80bc5b567a8d46b2c65eb0c8caf493dbc16db490c6197049e29e3f4e107ac5",
+     "outputs": 32510,
+     "reused": false
+    },
+    "20261004-tag-T-s3-s1base": {
+     "run_id": "20261004-tag-T-s3-s1base-predict-pool649",
+     "model_run": "20261004-tag-T-s3-s1base",
+     "predictions_sha256": "8ca92df6d1d69b87bcd411013d4c0d12543b482a5903da9fc6eda6eaf784d7b7",
+     "outputs": 32431,
+     "reused": false
+    }
+   },
+   "pool_with_u_0": 1,
+   "value_rule": "signal_b = uncertain_spans / union_spans (0 when union_spans < min_union_spans); ranked on the exact quotient, stored rounded to 4 decimals"
+  }
+ },
+ "selection_rule": "list A = the 100 pool chapters with the highest signal_a (ties: lower chapter number first); list B = the 100 chapters with the highest signal_b among the pool minus list A (ties: lower chapter number first). The 200 new chapters = A then B, in that order, 5 per pack: packs teach_b21..teach_b40 are list A sorted by signal_a descending, teach_b41..teach_b60 list B sorted by signal_b descending. The record stores both signals for every pool chapter, the cut values, and the strata distribution (the 8 ranges of the base config) of the 200.",
+ "n_new": 200,
+ "batch_size": 5,
+ "cut": {
+  "signal_a_100th": 17,
+  "signal_b_100th": 0.2027,
+  "note": "the signal value of the last chapter of each list (100 per list)"
+ },
+ "lists": {
+  "A": [
+   "ch0288",
+   "ch0604",
+   "ch0566",
+   "ch0606",
+   "ch0699",
+   "ch0118",
+   "ch0601",
+   "ch0602",
+   "ch0037",
+   "ch0407",
+   "ch0707",
+   "ch0144",
+   "ch0317",
+   "ch0611",
+   "ch0631",
+   "ch0662",
+   "ch0665",
+   "ch0704",
+   "ch0076",
+   "ch0571",
+   "ch0600",
+   "ch0032",
+   "ch0475",
+   "ch0572",
+   "ch0595",
+   "ch0644",
+   "ch0058",
+   "ch0138",
+   "ch0241",
+   "ch0312",
+   "ch0570",
+   "ch0034",
+   "ch0391",
+   "ch0416",
+   "ch0575",
+   "ch0591",
+   "ch0592",
+   "ch0661",
+   "ch0666",
+   "ch0754",
+   "ch0290",
+   "ch0515",
+   "ch0526",
+   "ch0569",
+   "ch0597",
+   "ch0603",
+   "ch0639",
+   "ch0145",
+   "ch0169",
+   "ch0369",
+   "ch0646",
+   "ch0658",
+   "ch0059",
+   "ch0177",
+   "ch0313",
+   "ch0580",
+   "ch0638",
+   "ch0724",
+   "ch0159",
+   "ch0171",
+   "ch0180",
+   "ch0255",
+   "ch0446",
+   "ch0456",
+   "ch0520",
+   "ch0540",
+   "ch0583",
+   "ch0695",
+   "ch0712",
+   "ch0720",
+   "ch0780",
+   "ch0309",
+   "ch0373",
+   "ch0409",
+   "ch0461",
+   "ch0467",
+   "ch0496",
+   "ch0556",
+   "ch0640",
+   "ch0696",
+   "ch0732",
+   "ch0029",
+   "ch0139",
+   "ch0219",
+   "ch0289",
+   "ch0336",
+   "ch0383",
+   "ch0408",
+   "ch0464",
+   "ch0483",
+   "ch0505",
+   "ch0561",
+   "ch0577",
+   "ch0586",
+   "ch0721",
+   "ch0722",
+   "ch0026",
+   "ch0073",
+   "ch0240",
+   "ch0315"
+  ],
+  "B": [
+   "ch0757",
+   "ch0367",
+   "ch0737",
+   "ch0599",
+   "ch0155",
+   "ch0481",
+   "ch0771",
+   "ch0741",
+   "ch0060",
+   "ch0017",
+   "ch0281",
+   "ch0476",
+   "ch0043",
+   "ch0229",
+   "ch0544",
+   "ch0419",
+   "ch0163",
+   "ch0641",
+   "ch0157",
+   "ch0330",
+   "ch0119",
+   "ch0760",
+   "ch0681",
+   "ch0701",
+   "ch0339",
+   "ch0042",
+   "ch0202",
+   "ch0258",
+   "ch0269",
+   "ch0123",
+   "ch0267",
+   "ch0764",
+   "ch0656",
+   "ch0484",
+   "ch0162",
+   "ch0158",
+   "ch0002",
+   "ch0146",
+   "ch0768",
+   "ch0376",
+   "ch0332",
+   "ch0702",
+   "ch0082",
+   "ch0257",
+   "ch0642",
+   "ch0018",
+   "ch0273",
+   "ch0271",
+   "ch0074",
+   "ch0635",
+   "ch0153",
+   "ch0645",
+   "ch0507",
+   "ch0122",
+   "ch0663",
+   "ch0222",
+   "ch0452",
+   "ch0653",
+   "ch0414",
+   "ch0228",
+   "ch0334",
+   "ch0125",
+   "ch0227",
+   "ch0185",
+   "ch0399",
+   "ch0514",
+   "ch0394",
+   "ch0150",
+   "ch0385",
+   "ch0498",
+   "ch0588",
+   "ch0596",
+   "ch0710",
+   "ch0598",
+   "ch0698",
+   "ch0634",
+   "ch0472",
+   "ch0667",
+   "ch0691",
+   "ch0176",
+   "ch0740",
+   "ch0045",
+   "ch0375",
+   "ch0175",
+   "ch0081",
+   "ch0773",
+   "ch0024",
+   "ch0314",
+   "ch0471",
+   "ch0420",
+   "ch0512",
+   "ch0056",
+   "ch0207",
+   "ch0246",
+   "ch0160",
+   "ch0238",
+   "ch0048",
+   "ch0734",
+   "ch0342",
+   "ch0400"
+  ]
+ },
+ "new": [
+  {
+   "chapter_id": "ch0288",
+   "number": 288,
+   "list": "A",
+   "signal_a": 39,
+   "signal_b": 0.2,
+   "union_spans": 70,
+   "uncertain_spans": 14,
+   "pack": "teach_b21",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0604",
+   "number": 604,
+   "list": "A",
+   "signal_a": 38,
+   "signal_b": 0.2353,
+   "union_spans": 85,
+   "uncertain_spans": 20,
+   "pack": "teach_b21",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0566",
+   "number": 566,
+   "list": "A",
+   "signal_a": 36,
+   "signal_b": 0.7573,
+   "union_spans": 103,
+   "uncertain_spans": 78,
+   "pack": "teach_b21",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0606",
+   "number": 606,
+   "list": "A",
+   "signal_a": 35,
+   "signal_b": 0.1579,
+   "union_spans": 76,
+   "uncertain_spans": 12,
+   "pack": "teach_b21",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0699",
+   "number": 699,
+   "list": "A",
+   "signal_a": 34,
+   "signal_b": 0.1695,
+   "union_spans": 59,
+   "uncertain_spans": 10,
+   "pack": "teach_b21",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0118",
+   "number": 118,
+   "list": "A",
+   "signal_a": 33,
+   "signal_b": 0.5984,
+   "union_spans": 122,
+   "uncertain_spans": 73,
+   "pack": "teach_b22",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0601",
+   "number": 601,
+   "list": "A",
+   "signal_a": 32,
+   "signal_b": 0.1954,
+   "union_spans": 87,
+   "uncertain_spans": 17,
+   "pack": "teach_b22",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0602",
+   "number": 602,
+   "list": "A",
+   "signal_a": 32,
+   "signal_b": 0.0792,
+   "union_spans": 101,
+   "uncertain_spans": 8,
+   "pack": "teach_b22",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0037",
+   "number": 37,
+   "list": "A",
+   "signal_a": 31,
+   "signal_b": 0.3548,
+   "union_spans": 62,
+   "uncertain_spans": 22,
+   "pack": "teach_b22",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0407",
+   "number": 407,
+   "list": "A",
+   "signal_a": 31,
+   "signal_b": 0.2903,
+   "union_spans": 62,
+   "uncertain_spans": 18,
+   "pack": "teach_b22",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0707",
+   "number": 707,
+   "list": "A",
+   "signal_a": 31,
+   "signal_b": 0.4416,
+   "union_spans": 77,
+   "uncertain_spans": 34,
+   "pack": "teach_b23",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0144",
+   "number": 144,
+   "list": "A",
+   "signal_a": 29,
+   "signal_b": 0.25,
+   "union_spans": 64,
+   "uncertain_spans": 16,
+   "pack": "teach_b23",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0317",
+   "number": 317,
+   "list": "A",
+   "signal_a": 29,
+   "signal_b": 0.2294,
+   "union_spans": 109,
+   "uncertain_spans": 25,
+   "pack": "teach_b23",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0611",
+   "number": 611,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.0105,
+   "union_spans": 95,
+   "uncertain_spans": 1,
+   "pack": "teach_b23",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0631",
+   "number": 631,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.0652,
+   "union_spans": 46,
+   "uncertain_spans": 3,
+   "pack": "teach_b23",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0662",
+   "number": 662,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.1311,
+   "union_spans": 61,
+   "uncertain_spans": 8,
+   "pack": "teach_b24",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0665",
+   "number": 665,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.2941,
+   "union_spans": 51,
+   "uncertain_spans": 15,
+   "pack": "teach_b24",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0704",
+   "number": 704,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.0299,
+   "union_spans": 67,
+   "uncertain_spans": 2,
+   "pack": "teach_b24",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0076",
+   "number": 76,
+   "list": "A",
+   "signal_a": 27,
+   "signal_b": 0.2361,
+   "union_spans": 72,
+   "uncertain_spans": 17,
+   "pack": "teach_b24",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0571",
+   "number": 571,
+   "list": "A",
+   "signal_a": 27,
+   "signal_b": 0.3,
+   "union_spans": 50,
+   "uncertain_spans": 15,
+   "pack": "teach_b24",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0600",
+   "number": 600,
+   "list": "A",
+   "signal_a": 27,
+   "signal_b": 0.402,
+   "union_spans": 102,
+   "uncertain_spans": 41,
+   "pack": "teach_b25",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0032",
+   "number": 32,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.1348,
+   "union_spans": 89,
+   "uncertain_spans": 12,
+   "pack": "teach_b25",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0475",
+   "number": 475,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.1311,
+   "union_spans": 61,
+   "uncertain_spans": 8,
+   "pack": "teach_b25",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0572",
+   "number": 572,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.602,
+   "union_spans": 98,
+   "uncertain_spans": 59,
+   "pack": "teach_b25",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0595",
+   "number": 595,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.3214,
+   "union_spans": 112,
+   "uncertain_spans": 36,
+   "pack": "teach_b25",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0644",
+   "number": 644,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.1392,
+   "union_spans": 79,
+   "uncertain_spans": 11,
+   "pack": "teach_b26",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0058",
+   "number": 58,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.2985,
+   "union_spans": 67,
+   "uncertain_spans": 20,
+   "pack": "teach_b26",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0138",
+   "number": 138,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.175,
+   "union_spans": 40,
+   "uncertain_spans": 7,
+   "pack": "teach_b26",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0241",
+   "number": 241,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.6154,
+   "union_spans": 65,
+   "uncertain_spans": 40,
+   "pack": "teach_b26",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0312",
+   "number": 312,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.1237,
+   "union_spans": 97,
+   "uncertain_spans": 12,
+   "pack": "teach_b26",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0570",
+   "number": 570,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.3448,
+   "union_spans": 58,
+   "uncertain_spans": 20,
+   "pack": "teach_b27",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0034",
+   "number": 34,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.1618,
+   "union_spans": 68,
+   "uncertain_spans": 11,
+   "pack": "teach_b27",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0391",
+   "number": 391,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.0533,
+   "union_spans": 75,
+   "uncertain_spans": 4,
+   "pack": "teach_b27",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0416",
+   "number": 416,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.2549,
+   "union_spans": 51,
+   "uncertain_spans": 13,
+   "pack": "teach_b27",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0575",
+   "number": 575,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.0588,
+   "union_spans": 85,
+   "uncertain_spans": 5,
+   "pack": "teach_b27",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0591",
+   "number": 591,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.0238,
+   "union_spans": 42,
+   "uncertain_spans": 1,
+   "pack": "teach_b28",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0592",
+   "number": 592,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.033,
+   "union_spans": 91,
+   "uncertain_spans": 3,
+   "pack": "teach_b28",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0661",
+   "number": 661,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.069,
+   "union_spans": 58,
+   "uncertain_spans": 4,
+   "pack": "teach_b28",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0666",
+   "number": 666,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.1519,
+   "union_spans": 79,
+   "uncertain_spans": 12,
+   "pack": "teach_b28",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0754",
+   "number": 754,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.2273,
+   "union_spans": 66,
+   "uncertain_spans": 15,
+   "pack": "teach_b28",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0290",
+   "number": 290,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.2078,
+   "union_spans": 77,
+   "uncertain_spans": 16,
+   "pack": "teach_b29",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0515",
+   "number": 515,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.2597,
+   "union_spans": 77,
+   "uncertain_spans": 20,
+   "pack": "teach_b29",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0526",
+   "number": 526,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.0159,
+   "union_spans": 63,
+   "uncertain_spans": 1,
+   "pack": "teach_b29",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0569",
+   "number": 569,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.2118,
+   "union_spans": 85,
+   "uncertain_spans": 18,
+   "pack": "teach_b29",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0597",
+   "number": 597,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.407,
+   "union_spans": 86,
+   "uncertain_spans": 35,
+   "pack": "teach_b29",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0603",
+   "number": 603,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.1918,
+   "union_spans": 73,
+   "uncertain_spans": 14,
+   "pack": "teach_b30",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0639",
+   "number": 639,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.2182,
+   "union_spans": 55,
+   "uncertain_spans": 12,
+   "pack": "teach_b30",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0145",
+   "number": 145,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.0638,
+   "union_spans": 47,
+   "uncertain_spans": 3,
+   "pack": "teach_b30",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0169",
+   "number": 169,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.1974,
+   "union_spans": 76,
+   "uncertain_spans": 15,
+   "pack": "teach_b30",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0369",
+   "number": 369,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.5294,
+   "union_spans": 85,
+   "uncertain_spans": 45,
+   "pack": "teach_b30",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0646",
+   "number": 646,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.0167,
+   "union_spans": 60,
+   "uncertain_spans": 1,
+   "pack": "teach_b31",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0658",
+   "number": 658,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.2462,
+   "union_spans": 65,
+   "uncertain_spans": 16,
+   "pack": "teach_b31",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0059",
+   "number": 59,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.4737,
+   "union_spans": 57,
+   "uncertain_spans": 27,
+   "pack": "teach_b31",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0177",
+   "number": 177,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.0968,
+   "union_spans": 62,
+   "uncertain_spans": 6,
+   "pack": "teach_b31",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0313",
+   "number": 313,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.125,
+   "union_spans": 48,
+   "uncertain_spans": 6,
+   "pack": "teach_b31",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0580",
+   "number": 580,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.0889,
+   "union_spans": 45,
+   "uncertain_spans": 4,
+   "pack": "teach_b32",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0638",
+   "number": 638,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.4419,
+   "union_spans": 43,
+   "uncertain_spans": 19,
+   "pack": "teach_b32",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0724",
+   "number": 724,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.1731,
+   "union_spans": 52,
+   "uncertain_spans": 9,
+   "pack": "teach_b32",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0159",
+   "number": 159,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.2308,
+   "union_spans": 78,
+   "uncertain_spans": 18,
+   "pack": "teach_b32",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0171",
+   "number": 171,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.2308,
+   "union_spans": 65,
+   "uncertain_spans": 15,
+   "pack": "teach_b32",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0180",
+   "number": 180,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.0667,
+   "union_spans": 75,
+   "uncertain_spans": 5,
+   "pack": "teach_b33",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0255",
+   "number": 255,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.0,
+   "union_spans": 68,
+   "uncertain_spans": 0,
+   "pack": "teach_b33",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0446",
+   "number": 446,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.0111,
+   "union_spans": 90,
+   "uncertain_spans": 1,
+   "pack": "teach_b33",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0456",
+   "number": 456,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.0,
+   "union_spans": 56,
+   "uncertain_spans": 0,
+   "pack": "teach_b33",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0520",
+   "number": 520,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.1273,
+   "union_spans": 55,
+   "uncertain_spans": 7,
+   "pack": "teach_b33",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0540",
+   "number": 540,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.1475,
+   "union_spans": 61,
+   "uncertain_spans": 9,
+   "pack": "teach_b34",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0583",
+   "number": 583,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.1132,
+   "union_spans": 53,
+   "uncertain_spans": 6,
+   "pack": "teach_b34",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0695",
+   "number": 695,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.1364,
+   "union_spans": 44,
+   "uncertain_spans": 6,
+   "pack": "teach_b34",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0712",
+   "number": 712,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.55,
+   "union_spans": 60,
+   "uncertain_spans": 33,
+   "pack": "teach_b34",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0720",
+   "number": 720,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.2466,
+   "union_spans": 73,
+   "uncertain_spans": 18,
+   "pack": "teach_b34",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0780",
+   "number": 780,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.3478,
+   "union_spans": 23,
+   "uncertain_spans": 8,
+   "pack": "teach_b35",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0309",
+   "number": 309,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.0865,
+   "union_spans": 104,
+   "uncertain_spans": 9,
+   "pack": "teach_b35",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0373",
+   "number": 373,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.3881,
+   "union_spans": 67,
+   "uncertain_spans": 26,
+   "pack": "teach_b35",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0409",
+   "number": 409,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.087,
+   "union_spans": 46,
+   "uncertain_spans": 4,
+   "pack": "teach_b35",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0461",
+   "number": 461,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.2,
+   "union_spans": 70,
+   "uncertain_spans": 14,
+   "pack": "teach_b35",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0467",
+   "number": 467,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.0667,
+   "union_spans": 60,
+   "uncertain_spans": 4,
+   "pack": "teach_b36",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0496",
+   "number": 496,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.1786,
+   "union_spans": 28,
+   "uncertain_spans": 5,
+   "pack": "teach_b36",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0556",
+   "number": 556,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.0909,
+   "union_spans": 66,
+   "uncertain_spans": 6,
+   "pack": "teach_b36",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0640",
+   "number": 640,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.2254,
+   "union_spans": 71,
+   "uncertain_spans": 16,
+   "pack": "teach_b36",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0696",
+   "number": 696,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.1364,
+   "union_spans": 66,
+   "uncertain_spans": 9,
+   "pack": "teach_b36",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0732",
+   "number": 732,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.2,
+   "union_spans": 50,
+   "uncertain_spans": 10,
+   "pack": "teach_b37",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0029",
+   "number": 29,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.25,
+   "union_spans": 84,
+   "uncertain_spans": 21,
+   "pack": "teach_b37",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0139",
+   "number": 139,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.2807,
+   "union_spans": 57,
+   "uncertain_spans": 16,
+   "pack": "teach_b37",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0219",
+   "number": 219,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.3529,
+   "union_spans": 51,
+   "uncertain_spans": 18,
+   "pack": "teach_b37",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0289",
+   "number": 289,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.2895,
+   "union_spans": 38,
+   "uncertain_spans": 11,
+   "pack": "teach_b37",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0336",
+   "number": 336,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.5769,
+   "union_spans": 52,
+   "uncertain_spans": 30,
+   "pack": "teach_b38",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0383",
+   "number": 383,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.1515,
+   "union_spans": 66,
+   "uncertain_spans": 10,
+   "pack": "teach_b38",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0408",
+   "number": 408,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.1071,
+   "union_spans": 56,
+   "uncertain_spans": 6,
+   "pack": "teach_b38",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0464",
+   "number": 464,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.2281,
+   "union_spans": 57,
+   "uncertain_spans": 13,
+   "pack": "teach_b38",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0483",
+   "number": 483,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.1975,
+   "union_spans": 81,
+   "uncertain_spans": 16,
+   "pack": "teach_b38",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0505",
+   "number": 505,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.4035,
+   "union_spans": 57,
+   "uncertain_spans": 23,
+   "pack": "teach_b39",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0561",
+   "number": 561,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.0154,
+   "union_spans": 65,
+   "uncertain_spans": 1,
+   "pack": "teach_b39",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0577",
+   "number": 577,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.0741,
+   "union_spans": 54,
+   "uncertain_spans": 4,
+   "pack": "teach_b39",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0586",
+   "number": 586,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.0667,
+   "union_spans": 60,
+   "uncertain_spans": 4,
+   "pack": "teach_b39",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0721",
+   "number": 721,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.0351,
+   "union_spans": 57,
+   "uncertain_spans": 2,
+   "pack": "teach_b39",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0722",
+   "number": 722,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.14,
+   "union_spans": 50,
+   "uncertain_spans": 7,
+   "pack": "teach_b40",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0026",
+   "number": 26,
+   "list": "A",
+   "signal_a": 17,
+   "signal_b": 0.4259,
+   "union_spans": 54,
+   "uncertain_spans": 23,
+   "pack": "teach_b40",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0073",
+   "number": 73,
+   "list": "A",
+   "signal_a": 17,
+   "signal_b": 0.186,
+   "union_spans": 43,
+   "uncertain_spans": 8,
+   "pack": "teach_b40",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0240",
+   "number": 240,
+   "list": "A",
+   "signal_a": 17,
+   "signal_b": 0.3284,
+   "union_spans": 67,
+   "uncertain_spans": 22,
+   "pack": "teach_b40",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0315",
+   "number": 315,
+   "list": "A",
+   "signal_a": 17,
+   "signal_b": 0.0597,
+   "union_spans": 67,
+   "uncertain_spans": 4,
+   "pack": "teach_b40",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0757",
+   "number": 757,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.5714,
+   "union_spans": 63,
+   "uncertain_spans": 36,
+   "pack": "teach_b41",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0367",
+   "number": 367,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.5469,
+   "union_spans": 64,
+   "uncertain_spans": 35,
+   "pack": "teach_b41",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0737",
+   "number": 737,
+   "list": "B",
+   "signal_a": 8,
+   "signal_b": 0.5417,
+   "union_spans": 24,
+   "uncertain_spans": 13,
+   "pack": "teach_b41",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0599",
+   "number": 599,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.5342,
+   "union_spans": 73,
+   "uncertain_spans": 39,
+   "pack": "teach_b41",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0155",
+   "number": 155,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.5294,
+   "union_spans": 51,
+   "uncertain_spans": 27,
+   "pack": "teach_b41",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0481",
+   "number": 481,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.5233,
+   "union_spans": 86,
+   "uncertain_spans": 45,
+   "pack": "teach_b42",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0771",
+   "number": 771,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.5111,
+   "union_spans": 45,
+   "uncertain_spans": 23,
+   "pack": "teach_b42",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0741",
+   "number": 741,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.4898,
+   "union_spans": 49,
+   "uncertain_spans": 24,
+   "pack": "teach_b42",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0060",
+   "number": 60,
+   "list": "B",
+   "signal_a": 14,
+   "signal_b": 0.459,
+   "union_spans": 61,
+   "uncertain_spans": 28,
+   "pack": "teach_b42",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0017",
+   "number": 17,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.4545,
+   "union_spans": 33,
+   "uncertain_spans": 15,
+   "pack": "teach_b42",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0281",
+   "number": 281,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.4375,
+   "union_spans": 48,
+   "uncertain_spans": 21,
+   "pack": "teach_b43",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0476",
+   "number": 476,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.4182,
+   "union_spans": 55,
+   "uncertain_spans": 23,
+   "pack": "teach_b43",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0043",
+   "number": 43,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.4,
+   "union_spans": 25,
+   "uncertain_spans": 10,
+   "pack": "teach_b43",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0229",
+   "number": 229,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.4,
+   "union_spans": 35,
+   "uncertain_spans": 14,
+   "pack": "teach_b43",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0544",
+   "number": 544,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.3902,
+   "union_spans": 41,
+   "uncertain_spans": 16,
+   "pack": "teach_b43",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0419",
+   "number": 419,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.3857,
+   "union_spans": 70,
+   "uncertain_spans": 27,
+   "pack": "teach_b44",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0163",
+   "number": 163,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.3846,
+   "union_spans": 26,
+   "uncertain_spans": 10,
+   "pack": "teach_b44",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0641",
+   "number": 641,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.3846,
+   "union_spans": 26,
+   "uncertain_spans": 10,
+   "pack": "teach_b44",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0157",
+   "number": 157,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.3696,
+   "union_spans": 46,
+   "uncertain_spans": 17,
+   "pack": "teach_b44",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0330",
+   "number": 330,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.3684,
+   "union_spans": 19,
+   "uncertain_spans": 7,
+   "pack": "teach_b44",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0119",
+   "number": 119,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.3626,
+   "union_spans": 91,
+   "uncertain_spans": 33,
+   "pack": "teach_b45",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0760",
+   "number": 760,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.3582,
+   "union_spans": 67,
+   "uncertain_spans": 24,
+   "pack": "teach_b45",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0681",
+   "number": 681,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.3529,
+   "union_spans": 34,
+   "uncertain_spans": 12,
+   "pack": "teach_b45",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0701",
+   "number": 701,
+   "list": "B",
+   "signal_a": 14,
+   "signal_b": 0.3514,
+   "union_spans": 74,
+   "uncertain_spans": 26,
+   "pack": "teach_b45",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0339",
+   "number": 339,
+   "list": "B",
+   "signal_a": 17,
+   "signal_b": 0.35,
+   "union_spans": 40,
+   "uncertain_spans": 14,
+   "pack": "teach_b45",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0042",
+   "number": 42,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.3478,
+   "union_spans": 69,
+   "uncertain_spans": 24,
+   "pack": "teach_b46",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0202",
+   "number": 202,
+   "list": "B",
+   "signal_a": 1,
+   "signal_b": 0.3469,
+   "union_spans": 49,
+   "uncertain_spans": 17,
+   "pack": "teach_b46",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0258",
+   "number": 258,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.3404,
+   "union_spans": 47,
+   "uncertain_spans": 16,
+   "pack": "teach_b46",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0269",
+   "number": 269,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.3404,
+   "union_spans": 47,
+   "uncertain_spans": 16,
+   "pack": "teach_b46",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0123",
+   "number": 123,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.3333,
+   "union_spans": 57,
+   "uncertain_spans": 19,
+   "pack": "teach_b46",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0267",
+   "number": 267,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.3333,
+   "union_spans": 33,
+   "uncertain_spans": 11,
+   "pack": "teach_b47",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0764",
+   "number": 764,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.3333,
+   "union_spans": 39,
+   "uncertain_spans": 13,
+   "pack": "teach_b47",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0656",
+   "number": 656,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.3284,
+   "union_spans": 67,
+   "uncertain_spans": 22,
+   "pack": "teach_b47",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0484",
+   "number": 484,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.3281,
+   "union_spans": 64,
+   "uncertain_spans": 21,
+   "pack": "teach_b47",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0162",
+   "number": 162,
+   "list": "B",
+   "signal_a": 8,
+   "signal_b": 0.3231,
+   "union_spans": 65,
+   "uncertain_spans": 21,
+   "pack": "teach_b47",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0158",
+   "number": 158,
+   "list": "B",
+   "signal_a": 8,
+   "signal_b": 0.3214,
+   "union_spans": 56,
+   "uncertain_spans": 18,
+   "pack": "teach_b48",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0002",
+   "number": 2,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.3171,
+   "union_spans": 41,
+   "uncertain_spans": 13,
+   "pack": "teach_b48",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0146",
+   "number": 146,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.3171,
+   "union_spans": 41,
+   "uncertain_spans": 13,
+   "pack": "teach_b48",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0768",
+   "number": 768,
+   "list": "B",
+   "signal_a": 2,
+   "signal_b": 0.3111,
+   "union_spans": 45,
+   "uncertain_spans": 14,
+   "pack": "teach_b48",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0376",
+   "number": 376,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.3095,
+   "union_spans": 42,
+   "uncertain_spans": 13,
+   "pack": "teach_b48",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0332",
+   "number": 332,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.3077,
+   "union_spans": 13,
+   "uncertain_spans": 4,
+   "pack": "teach_b49",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0702",
+   "number": 702,
+   "list": "B",
+   "signal_a": 14,
+   "signal_b": 0.3077,
+   "union_spans": 65,
+   "uncertain_spans": 20,
+   "pack": "teach_b49",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0082",
+   "number": 82,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.3067,
+   "union_spans": 75,
+   "uncertain_spans": 23,
+   "pack": "teach_b49",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0257",
+   "number": 257,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.3061,
+   "union_spans": 49,
+   "uncertain_spans": 15,
+   "pack": "teach_b49",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0642",
+   "number": 642,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.3061,
+   "union_spans": 49,
+   "uncertain_spans": 15,
+   "pack": "teach_b49",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0018",
+   "number": 18,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.303,
+   "union_spans": 33,
+   "uncertain_spans": 10,
+   "pack": "teach_b50",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0273",
+   "number": 273,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.3,
+   "union_spans": 50,
+   "uncertain_spans": 15,
+   "pack": "teach_b50",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0271",
+   "number": 271,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2963,
+   "union_spans": 27,
+   "uncertain_spans": 8,
+   "pack": "teach_b50",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0074",
+   "number": 74,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.2927,
+   "union_spans": 41,
+   "uncertain_spans": 12,
+   "pack": "teach_b50",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0635",
+   "number": 635,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.2791,
+   "union_spans": 43,
+   "uncertain_spans": 12,
+   "pack": "teach_b50",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0153",
+   "number": 153,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2769,
+   "union_spans": 65,
+   "uncertain_spans": 18,
+   "pack": "teach_b51",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0645",
+   "number": 645,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.2766,
+   "union_spans": 47,
+   "uncertain_spans": 13,
+   "pack": "teach_b51",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0507",
+   "number": 507,
+   "list": "B",
+   "signal_a": 2,
+   "signal_b": 0.2759,
+   "union_spans": 29,
+   "uncertain_spans": 8,
+   "pack": "teach_b51",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0122",
+   "number": 122,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.2738,
+   "union_spans": 84,
+   "uncertain_spans": 23,
+   "pack": "teach_b51",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0663",
+   "number": 663,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2727,
+   "union_spans": 33,
+   "uncertain_spans": 9,
+   "pack": "teach_b51",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0222",
+   "number": 222,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2714,
+   "union_spans": 70,
+   "uncertain_spans": 19,
+   "pack": "teach_b52",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0452",
+   "number": 452,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.2714,
+   "union_spans": 70,
+   "uncertain_spans": 19,
+   "pack": "teach_b52",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0653",
+   "number": 653,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2683,
+   "union_spans": 41,
+   "uncertain_spans": 11,
+   "pack": "teach_b52",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0414",
+   "number": 414,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2667,
+   "union_spans": 45,
+   "uncertain_spans": 12,
+   "pack": "teach_b52",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0228",
+   "number": 228,
+   "list": "B",
+   "signal_a": 0,
+   "signal_b": 0.2656,
+   "union_spans": 64,
+   "uncertain_spans": 17,
+   "pack": "teach_b52",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0334",
+   "number": 334,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.2632,
+   "union_spans": 38,
+   "uncertain_spans": 10,
+   "pack": "teach_b53",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0125",
+   "number": 125,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.2619,
+   "union_spans": 42,
+   "uncertain_spans": 11,
+   "pack": "teach_b53",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0227",
+   "number": 227,
+   "list": "B",
+   "signal_a": 1,
+   "signal_b": 0.2609,
+   "union_spans": 69,
+   "uncertain_spans": 18,
+   "pack": "teach_b53",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0185",
+   "number": 185,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.2593,
+   "union_spans": 54,
+   "uncertain_spans": 14,
+   "pack": "teach_b53",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0399",
+   "number": 399,
+   "list": "B",
+   "signal_a": 0,
+   "signal_b": 0.2581,
+   "union_spans": 31,
+   "uncertain_spans": 8,
+   "pack": "teach_b53",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0514",
+   "number": 514,
+   "list": "B",
+   "signal_a": 1,
+   "signal_b": 0.2564,
+   "union_spans": 39,
+   "uncertain_spans": 10,
+   "pack": "teach_b54",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0394",
+   "number": 394,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.2553,
+   "union_spans": 47,
+   "uncertain_spans": 12,
+   "pack": "teach_b54",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0150",
+   "number": 150,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.25,
+   "union_spans": 28,
+   "uncertain_spans": 7,
+   "pack": "teach_b54",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0385",
+   "number": 385,
+   "list": "B",
+   "signal_a": 2,
+   "signal_b": 0.25,
+   "union_spans": 48,
+   "uncertain_spans": 12,
+   "pack": "teach_b54",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0498",
+   "number": 498,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.25,
+   "union_spans": 24,
+   "uncertain_spans": 6,
+   "pack": "teach_b54",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0588",
+   "number": 588,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.25,
+   "union_spans": 48,
+   "uncertain_spans": 12,
+   "pack": "teach_b55",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0596",
+   "number": 596,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.2466,
+   "union_spans": 73,
+   "uncertain_spans": 18,
+   "pack": "teach_b55",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0710",
+   "number": 710,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2462,
+   "union_spans": 65,
+   "uncertain_spans": 16,
+   "pack": "teach_b55",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0598",
+   "number": 598,
+   "list": "B",
+   "signal_a": 15,
+   "signal_b": 0.2456,
+   "union_spans": 57,
+   "uncertain_spans": 14,
+   "pack": "teach_b55",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0698",
+   "number": 698,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.2456,
+   "union_spans": 57,
+   "uncertain_spans": 14,
+   "pack": "teach_b55",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0634",
+   "number": 634,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.2439,
+   "union_spans": 41,
+   "uncertain_spans": 10,
+   "pack": "teach_b56",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0472",
+   "number": 472,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.2432,
+   "union_spans": 37,
+   "uncertain_spans": 9,
+   "pack": "teach_b56",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0667",
+   "number": 667,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2373,
+   "union_spans": 59,
+   "uncertain_spans": 14,
+   "pack": "teach_b56",
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0691",
+   "number": 691,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2364,
+   "union_spans": 55,
+   "uncertain_spans": 13,
+   "pack": "teach_b56",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0176",
+   "number": 176,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.234,
+   "union_spans": 47,
+   "uncertain_spans": 11,
+   "pack": "teach_b56",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0740",
+   "number": 740,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.2333,
+   "union_spans": 30,
+   "uncertain_spans": 7,
+   "pack": "teach_b57",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0045",
+   "number": 45,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.2292,
+   "union_spans": 48,
+   "uncertain_spans": 11,
+   "pack": "teach_b57",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0375",
+   "number": 375,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2273,
+   "union_spans": 44,
+   "uncertain_spans": 10,
+   "pack": "teach_b57",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0175",
+   "number": 175,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2264,
+   "union_spans": 53,
+   "uncertain_spans": 12,
+   "pack": "teach_b57",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0081",
+   "number": 81,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.2254,
+   "union_spans": 71,
+   "uncertain_spans": 16,
+   "pack": "teach_b57",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0773",
+   "number": 773,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.2195,
+   "union_spans": 41,
+   "uncertain_spans": 9,
+   "pack": "teach_b58",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0024",
+   "number": 24,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.2152,
+   "union_spans": 79,
+   "uncertain_spans": 17,
+   "pack": "teach_b58",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0314",
+   "number": 314,
+   "list": "B",
+   "signal_a": 14,
+   "signal_b": 0.2152,
+   "union_spans": 79,
+   "uncertain_spans": 17,
+   "pack": "teach_b58",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0471",
+   "number": 471,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.2143,
+   "union_spans": 28,
+   "uncertain_spans": 6,
+   "pack": "teach_b58",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0420",
+   "number": 420,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.2121,
+   "union_spans": 33,
+   "uncertain_spans": 7,
+   "pack": "teach_b58",
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0512",
+   "number": 512,
+   "list": "B",
+   "signal_a": 2,
+   "signal_b": 0.2097,
+   "union_spans": 62,
+   "uncertain_spans": 13,
+   "pack": "teach_b59",
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0056",
+   "number": 56,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.2093,
+   "union_spans": 43,
+   "uncertain_spans": 9,
+   "pack": "teach_b59",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0207",
+   "number": 207,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.2093,
+   "union_spans": 43,
+   "uncertain_spans": 9,
+   "pack": "teach_b59",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0246",
+   "number": 246,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.2083,
+   "union_spans": 48,
+   "uncertain_spans": 10,
+   "pack": "teach_b59",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0160",
+   "number": 160,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.2069,
+   "union_spans": 58,
+   "uncertain_spans": 12,
+   "pack": "teach_b59",
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0238",
+   "number": 238,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.2063,
+   "union_spans": 63,
+   "uncertain_spans": 13,
+   "pack": "teach_b60",
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0048",
+   "number": 48,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2059,
+   "union_spans": 34,
+   "uncertain_spans": 7,
+   "pack": "teach_b60",
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0734",
+   "number": 734,
+   "list": "B",
+   "signal_a": 17,
+   "signal_b": 0.2059,
+   "union_spans": 68,
+   "uncertain_spans": 14,
+   "pack": "teach_b60",
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0342",
+   "number": 342,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.2045,
+   "union_spans": 44,
+   "uncertain_spans": 9,
+   "pack": "teach_b60",
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0400",
+   "number": 400,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.2027,
+   "union_spans": 74,
+   "uncertain_spans": 15,
+   "pack": "teach_b60",
+   "stratum": "s05"
+  }
+ ],
+ "pool_signals": [
+  {
+   "chapter_id": "ch0001",
+   "number": 1,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1,
+   "union_spans": 30,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0002",
+   "number": 2,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.3171,
+   "union_spans": 41,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0004",
+   "number": 4,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0943,
+   "union_spans": 53,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0006",
+   "number": 6,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.2,
+   "union_spans": 45,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0007",
+   "number": 7,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.1897,
+   "union_spans": 58,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0008",
+   "number": 8,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0256,
+   "union_spans": 39,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0009",
+   "number": 9,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0968,
+   "union_spans": 62,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0010",
+   "number": 10,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0147,
+   "union_spans": 68,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0011",
+   "number": 11,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 55,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0012",
+   "number": 12,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 42,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0013",
+   "number": 13,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0444,
+   "union_spans": 45,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0014",
+   "number": 14,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 50,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0015",
+   "number": 15,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 40,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0017",
+   "number": 17,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.4545,
+   "union_spans": 33,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0018",
+   "number": 18,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.303,
+   "union_spans": 33,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0019",
+   "number": 19,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.1333,
+   "union_spans": 15,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0020",
+   "number": 20,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 44,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0021",
+   "number": 21,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0345,
+   "union_spans": 58,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0022",
+   "number": 22,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.1852,
+   "union_spans": 27,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0023",
+   "number": 23,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.0943,
+   "union_spans": 53,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0024",
+   "number": 24,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.2152,
+   "union_spans": 79,
+   "uncertain_spans": 17
+  },
+  {
+   "chapter_id": "ch0025",
+   "number": 25,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.0577,
+   "union_spans": 52,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0026",
+   "number": 26,
+   "list": "A",
+   "signal_a": 17,
+   "signal_b": 0.4259,
+   "union_spans": 54,
+   "uncertain_spans": 23
+  },
+  {
+   "chapter_id": "ch0027",
+   "number": 27,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0323,
+   "union_spans": 62,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0029",
+   "number": 29,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.25,
+   "union_spans": 84,
+   "uncertain_spans": 21
+  },
+  {
+   "chapter_id": "ch0030",
+   "number": 30,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.087,
+   "union_spans": 69,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0032",
+   "number": 32,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.1348,
+   "union_spans": 89,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0034",
+   "number": 34,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.1618,
+   "union_spans": 68,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0035",
+   "number": 35,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1558,
+   "union_spans": 77,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0036",
+   "number": 36,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.0857,
+   "union_spans": 70,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0037",
+   "number": 37,
+   "list": "A",
+   "signal_a": 31,
+   "signal_b": 0.3548,
+   "union_spans": 62,
+   "uncertain_spans": 22
+  },
+  {
+   "chapter_id": "ch0038",
+   "number": 38,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.1667,
+   "union_spans": 54,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0040",
+   "number": 40,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.1951,
+   "union_spans": 41,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0041",
+   "number": 41,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0938,
+   "union_spans": 32,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0042",
+   "number": 42,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.3478,
+   "union_spans": 69,
+   "uncertain_spans": 24
+  },
+  {
+   "chapter_id": "ch0043",
+   "number": 43,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.4,
+   "union_spans": 25,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0044",
+   "number": 44,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0909,
+   "union_spans": 55,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0045",
+   "number": 45,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.2292,
+   "union_spans": 48,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0047",
+   "number": 47,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0312,
+   "union_spans": 64,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0048",
+   "number": 48,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2059,
+   "union_spans": 34,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0049",
+   "number": 49,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0513,
+   "union_spans": 39,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0050",
+   "number": 50,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.037,
+   "union_spans": 54,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0051",
+   "number": 51,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1364,
+   "union_spans": 22,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0053",
+   "number": 53,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.05,
+   "union_spans": 60,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0054",
+   "number": 54,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0645,
+   "union_spans": 62,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0055",
+   "number": 55,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 51,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0056",
+   "number": 56,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.2093,
+   "union_spans": 43,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0058",
+   "number": 58,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.2985,
+   "union_spans": 67,
+   "uncertain_spans": 20
+  },
+  {
+   "chapter_id": "ch0059",
+   "number": 59,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.4737,
+   "union_spans": 57,
+   "uncertain_spans": 27
+  },
+  {
+   "chapter_id": "ch0060",
+   "number": 60,
+   "list": "B",
+   "signal_a": 14,
+   "signal_b": 0.459,
+   "union_spans": 61,
+   "uncertain_spans": 28
+  },
+  {
+   "chapter_id": "ch0061",
+   "number": 61,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.1111,
+   "union_spans": 45,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0063",
+   "number": 63,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0,
+   "union_spans": 37,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0064",
+   "number": 64,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1333,
+   "union_spans": 90,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0065",
+   "number": 65,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0652,
+   "union_spans": 92,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0067",
+   "number": 67,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0645,
+   "union_spans": 62,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0068",
+   "number": 68,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0,
+   "union_spans": 63,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0069",
+   "number": 69,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.1096,
+   "union_spans": 73,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0071",
+   "number": 71,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1538,
+   "union_spans": 65,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0072",
+   "number": 72,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0122,
+   "union_spans": 82,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0073",
+   "number": 73,
+   "list": "A",
+   "signal_a": 17,
+   "signal_b": 0.186,
+   "union_spans": 43,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0074",
+   "number": 74,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.2927,
+   "union_spans": 41,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0075",
+   "number": 75,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.1304,
+   "union_spans": 23,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0076",
+   "number": 76,
+   "list": "A",
+   "signal_a": 27,
+   "signal_b": 0.2361,
+   "union_spans": 72,
+   "uncertain_spans": 17
+  },
+  {
+   "chapter_id": "ch0077",
+   "number": 77,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1395,
+   "union_spans": 86,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0078",
+   "number": 78,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.098,
+   "union_spans": 51,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0079",
+   "number": 79,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0385,
+   "union_spans": 52,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0080",
+   "number": 80,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0317,
+   "union_spans": 63,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0081",
+   "number": 81,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.2254,
+   "union_spans": 71,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0082",
+   "number": 82,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.3067,
+   "union_spans": 75,
+   "uncertain_spans": 23
+  },
+  {
+   "chapter_id": "ch0084",
+   "number": 84,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 51,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0086",
+   "number": 86,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 21,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0087",
+   "number": 87,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0952,
+   "union_spans": 42,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0089",
+   "number": 89,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.05,
+   "union_spans": 40,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0090",
+   "number": 90,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0294,
+   "union_spans": 68,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0091",
+   "number": 91,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 44,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0093",
+   "number": 93,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0714,
+   "union_spans": 42,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0094",
+   "number": 94,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.1154,
+   "union_spans": 78,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0095",
+   "number": 95,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0333,
+   "union_spans": 60,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0096",
+   "number": 96,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0,
+   "union_spans": 61,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0098",
+   "number": 98,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 68,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0099",
+   "number": 99,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0392,
+   "union_spans": 51,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0100",
+   "number": 100,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0484,
+   "union_spans": 62,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0101",
+   "number": 101,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0448,
+   "union_spans": 67,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0104",
+   "number": 104,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 70,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0105",
+   "number": 105,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 68,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0106",
+   "number": 106,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 63,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0107",
+   "number": 107,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 73,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0108",
+   "number": 108,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 52,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0109",
+   "number": 109,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0833,
+   "union_spans": 72,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0110",
+   "number": 110,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.15,
+   "union_spans": 60,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0111",
+   "number": 111,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.1091,
+   "union_spans": 55,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0112",
+   "number": 112,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0909,
+   "union_spans": 66,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0113",
+   "number": 113,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0563,
+   "union_spans": 71,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0115",
+   "number": 115,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.069,
+   "union_spans": 58,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0116",
+   "number": 116,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0303,
+   "union_spans": 66,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0117",
+   "number": 117,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.0,
+   "union_spans": 71,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0118",
+   "number": 118,
+   "list": "A",
+   "signal_a": 33,
+   "signal_b": 0.5984,
+   "union_spans": 122,
+   "uncertain_spans": 73
+  },
+  {
+   "chapter_id": "ch0119",
+   "number": 119,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.3626,
+   "union_spans": 91,
+   "uncertain_spans": 33
+  },
+  {
+   "chapter_id": "ch0121",
+   "number": 121,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0753,
+   "union_spans": 93,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0122",
+   "number": 122,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.2738,
+   "union_spans": 84,
+   "uncertain_spans": 23
+  },
+  {
+   "chapter_id": "ch0123",
+   "number": 123,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.3333,
+   "union_spans": 57,
+   "uncertain_spans": 19
+  },
+  {
+   "chapter_id": "ch0125",
+   "number": 125,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.2619,
+   "union_spans": 42,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0126",
+   "number": 126,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 24,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0127",
+   "number": 127,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0625,
+   "union_spans": 32,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0128",
+   "number": 128,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.1,
+   "union_spans": 30,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0129",
+   "number": 129,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0769,
+   "union_spans": 26,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0130",
+   "number": 130,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0244,
+   "union_spans": 41,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0131",
+   "number": 131,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 31,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0132",
+   "number": 132,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 36,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0133",
+   "number": 133,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 33,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0135",
+   "number": 135,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0154,
+   "union_spans": 65,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0137",
+   "number": 137,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0351,
+   "union_spans": 57,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0138",
+   "number": 138,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.175,
+   "union_spans": 40,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0139",
+   "number": 139,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.2807,
+   "union_spans": 57,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0140",
+   "number": 140,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0303,
+   "union_spans": 33,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0141",
+   "number": 141,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.125,
+   "union_spans": 32,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0142",
+   "number": 142,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.1429,
+   "union_spans": 14,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0143",
+   "number": 143,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0488,
+   "union_spans": 41,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0144",
+   "number": 144,
+   "list": "A",
+   "signal_a": 29,
+   "signal_b": 0.25,
+   "union_spans": 64,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0145",
+   "number": 145,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.0638,
+   "union_spans": 47,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0146",
+   "number": 146,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.3171,
+   "union_spans": 41,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0147",
+   "number": 147,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0909,
+   "union_spans": 11,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0150",
+   "number": 150,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.25,
+   "union_spans": 28,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0152",
+   "number": 152,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0357,
+   "union_spans": 28,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0153",
+   "number": 153,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2769,
+   "union_spans": 65,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0154",
+   "number": 154,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0441,
+   "union_spans": 68,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0155",
+   "number": 155,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.5294,
+   "union_spans": 51,
+   "uncertain_spans": 27
+  },
+  {
+   "chapter_id": "ch0156",
+   "number": 156,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0455,
+   "union_spans": 44,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0157",
+   "number": 157,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.3696,
+   "union_spans": 46,
+   "uncertain_spans": 17
+  },
+  {
+   "chapter_id": "ch0158",
+   "number": 158,
+   "list": "B",
+   "signal_a": 8,
+   "signal_b": 0.3214,
+   "union_spans": 56,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0159",
+   "number": 159,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.2308,
+   "union_spans": 78,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0160",
+   "number": 160,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.2069,
+   "union_spans": 58,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0161",
+   "number": 161,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0566,
+   "union_spans": 53,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0162",
+   "number": 162,
+   "list": "B",
+   "signal_a": 8,
+   "signal_b": 0.3231,
+   "union_spans": 65,
+   "uncertain_spans": 21
+  },
+  {
+   "chapter_id": "ch0163",
+   "number": 163,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.3846,
+   "union_spans": 26,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0164",
+   "number": 164,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.0156,
+   "union_spans": 64,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0165",
+   "number": 165,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.1379,
+   "union_spans": 58,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0166",
+   "number": 166,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.0755,
+   "union_spans": 53,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0167",
+   "number": 167,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.1,
+   "union_spans": 70,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0168",
+   "number": 168,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1607,
+   "union_spans": 56,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0169",
+   "number": 169,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.1974,
+   "union_spans": 76,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0170",
+   "number": 170,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.12,
+   "union_spans": 75,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0171",
+   "number": 171,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.2308,
+   "union_spans": 65,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0174",
+   "number": 174,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.1148,
+   "union_spans": 61,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0175",
+   "number": 175,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2264,
+   "union_spans": 53,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0176",
+   "number": 176,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.234,
+   "union_spans": 47,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0177",
+   "number": 177,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.0968,
+   "union_spans": 62,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0178",
+   "number": 178,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.1042,
+   "union_spans": 48,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0179",
+   "number": 179,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.058,
+   "union_spans": 69,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0180",
+   "number": 180,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.0667,
+   "union_spans": 75,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0181",
+   "number": 181,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0494,
+   "union_spans": 81,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0182",
+   "number": 182,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.1273,
+   "union_spans": 55,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0183",
+   "number": 183,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0536,
+   "union_spans": 56,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0184",
+   "number": 184,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0588,
+   "union_spans": 51,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0185",
+   "number": 185,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.2593,
+   "union_spans": 54,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0186",
+   "number": 186,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 35,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0188",
+   "number": 188,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 28,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0189",
+   "number": 189,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 32,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0190",
+   "number": 190,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0625,
+   "union_spans": 32,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0191",
+   "number": 191,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0625,
+   "union_spans": 32,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0192",
+   "number": 192,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0303,
+   "union_spans": 33,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0194",
+   "number": 194,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 34,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0196",
+   "number": 196,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.1379,
+   "union_spans": 58,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0197",
+   "number": 197,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0,
+   "union_spans": 49,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0198",
+   "number": 198,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0,
+   "union_spans": 55,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0199",
+   "number": 199,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0364,
+   "union_spans": 55,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0200",
+   "number": 200,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0286,
+   "union_spans": 70,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0201",
+   "number": 201,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0435,
+   "union_spans": 46,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0202",
+   "number": 202,
+   "list": "B",
+   "signal_a": 1,
+   "signal_b": 0.3469,
+   "union_spans": 49,
+   "uncertain_spans": 17
+  },
+  {
+   "chapter_id": "ch0203",
+   "number": 203,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0476,
+   "union_spans": 63,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0204",
+   "number": 204,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0351,
+   "union_spans": 57,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0205",
+   "number": 205,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0286,
+   "union_spans": 35,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0206",
+   "number": 206,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0571,
+   "union_spans": 35,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0207",
+   "number": 207,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.2093,
+   "union_spans": 43,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0208",
+   "number": 208,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1622,
+   "union_spans": 74,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0209",
+   "number": 209,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0196,
+   "union_spans": 51,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0211",
+   "number": 211,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0,
+   "union_spans": 60,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0212",
+   "number": 212,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0704,
+   "union_spans": 71,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0213",
+   "number": 213,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 60,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0214",
+   "number": 214,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.087,
+   "union_spans": 69,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0215",
+   "number": 215,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0,
+   "union_spans": 59,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0217",
+   "number": 217,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0152,
+   "union_spans": 66,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0218",
+   "number": 218,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0,
+   "union_spans": 50,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0219",
+   "number": 219,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.3529,
+   "union_spans": 51,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0220",
+   "number": 220,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.141,
+   "union_spans": 78,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0221",
+   "number": 221,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0577,
+   "union_spans": 52,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0222",
+   "number": 222,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2714,
+   "union_spans": 70,
+   "uncertain_spans": 19
+  },
+  {
+   "chapter_id": "ch0223",
+   "number": 223,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.2,
+   "union_spans": 45,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0224",
+   "number": 224,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 43,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0225",
+   "number": 225,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0556,
+   "union_spans": 54,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0226",
+   "number": 226,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1408,
+   "union_spans": 71,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0227",
+   "number": 227,
+   "list": "B",
+   "signal_a": 1,
+   "signal_b": 0.2609,
+   "union_spans": 69,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0228",
+   "number": 228,
+   "list": "B",
+   "signal_a": 0,
+   "signal_b": 0.2656,
+   "union_spans": 64,
+   "uncertain_spans": 17
+  },
+  {
+   "chapter_id": "ch0229",
+   "number": 229,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.4,
+   "union_spans": 35,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0230",
+   "number": 230,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0988,
+   "union_spans": 81,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0232",
+   "number": 232,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 71,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0233",
+   "number": 233,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 73,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0234",
+   "number": 234,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1026,
+   "union_spans": 78,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0236",
+   "number": 236,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1928,
+   "union_spans": 83,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0237",
+   "number": 237,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0,
+   "union_spans": 61,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0238",
+   "number": 238,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.2063,
+   "union_spans": 63,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0239",
+   "number": 239,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.1778,
+   "union_spans": 45,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0240",
+   "number": 240,
+   "list": "A",
+   "signal_a": 17,
+   "signal_b": 0.3284,
+   "union_spans": 67,
+   "uncertain_spans": 22
+  },
+  {
+   "chapter_id": "ch0241",
+   "number": 241,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.6154,
+   "union_spans": 65,
+   "uncertain_spans": 40
+  },
+  {
+   "chapter_id": "ch0243",
+   "number": 243,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.1579,
+   "union_spans": 57,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0244",
+   "number": 244,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0526,
+   "union_spans": 57,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0245",
+   "number": 245,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.129,
+   "union_spans": 62,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0246",
+   "number": 246,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.2083,
+   "union_spans": 48,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0247",
+   "number": 247,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0794,
+   "union_spans": 63,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0249",
+   "number": 249,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 36,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0250",
+   "number": 250,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.137,
+   "union_spans": 73,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0252",
+   "number": 252,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0455,
+   "union_spans": 44,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0253",
+   "number": 253,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0588,
+   "union_spans": 51,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0254",
+   "number": 254,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0577,
+   "union_spans": 52,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0255",
+   "number": 255,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.0,
+   "union_spans": 68,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0256",
+   "number": 256,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.0784,
+   "union_spans": 51,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0257",
+   "number": 257,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.3061,
+   "union_spans": 49,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0258",
+   "number": 258,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.3404,
+   "union_spans": 47,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0259",
+   "number": 259,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0811,
+   "union_spans": 37,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0260",
+   "number": 260,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0606,
+   "union_spans": 33,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0262",
+   "number": 262,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0263,
+   "union_spans": 38,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0263",
+   "number": 263,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.075,
+   "union_spans": 40,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0265",
+   "number": 265,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.093,
+   "union_spans": 43,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0267",
+   "number": 267,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.3333,
+   "union_spans": 33,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0269",
+   "number": 269,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.3404,
+   "union_spans": 47,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0270",
+   "number": 270,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1667,
+   "union_spans": 42,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0271",
+   "number": 271,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2963,
+   "union_spans": 27,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0272",
+   "number": 272,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1875,
+   "union_spans": 16,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0273",
+   "number": 273,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.3,
+   "union_spans": 50,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0274",
+   "number": 274,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0408,
+   "union_spans": 49,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0276",
+   "number": 276,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0345,
+   "union_spans": 29,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0277",
+   "number": 277,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0263,
+   "union_spans": 38,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0278",
+   "number": 278,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1795,
+   "union_spans": 39,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0279",
+   "number": 279,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0278,
+   "union_spans": 36,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0280",
+   "number": 280,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 29,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0281",
+   "number": 281,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.4375,
+   "union_spans": 48,
+   "uncertain_spans": 21
+  },
+  {
+   "chapter_id": "ch0282",
+   "number": 282,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0938,
+   "union_spans": 64,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0283",
+   "number": 283,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 49,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0284",
+   "number": 284,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0238,
+   "union_spans": 42,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0285",
+   "number": 285,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1852,
+   "union_spans": 54,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0286",
+   "number": 286,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1875,
+   "union_spans": 32,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0287",
+   "number": 287,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.082,
+   "union_spans": 61,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0288",
+   "number": 288,
+   "list": "A",
+   "signal_a": 39,
+   "signal_b": 0.2,
+   "union_spans": 70,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0289",
+   "number": 289,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.2895,
+   "union_spans": 38,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0290",
+   "number": 290,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.2078,
+   "union_spans": 77,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0291",
+   "number": 291,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.1026,
+   "union_spans": 39,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0294",
+   "number": 294,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0179,
+   "union_spans": 56,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0295",
+   "number": 295,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0172,
+   "union_spans": 58,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0296",
+   "number": 296,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0,
+   "union_spans": 53,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0297",
+   "number": 297,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 30,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0299",
+   "number": 299,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0714,
+   "union_spans": 42,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0301",
+   "number": 301,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0,
+   "union_spans": 41,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0302",
+   "number": 302,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.04,
+   "union_spans": 25,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0303",
+   "number": 303,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0244,
+   "union_spans": 41,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0304",
+   "number": 304,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0667,
+   "union_spans": 45,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0305",
+   "number": 305,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1538,
+   "union_spans": 65,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0306",
+   "number": 306,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.087,
+   "union_spans": 23,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0307",
+   "number": 307,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.0879,
+   "union_spans": 91,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0308",
+   "number": 308,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.0,
+   "union_spans": 76,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0309",
+   "number": 309,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.0865,
+   "union_spans": 104,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0310",
+   "number": 310,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0,
+   "union_spans": 51,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0311",
+   "number": 311,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.0,
+   "union_spans": 76,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0312",
+   "number": 312,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.1237,
+   "union_spans": 97,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0313",
+   "number": 313,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.125,
+   "union_spans": 48,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0314",
+   "number": 314,
+   "list": "B",
+   "signal_a": 14,
+   "signal_b": 0.2152,
+   "union_spans": 79,
+   "uncertain_spans": 17
+  },
+  {
+   "chapter_id": "ch0315",
+   "number": 315,
+   "list": "A",
+   "signal_a": 17,
+   "signal_b": 0.0597,
+   "union_spans": 67,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0316",
+   "number": 316,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0366,
+   "union_spans": 82,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0317",
+   "number": 317,
+   "list": "A",
+   "signal_a": 29,
+   "signal_b": 0.2294,
+   "union_spans": 109,
+   "uncertain_spans": 25
+  },
+  {
+   "chapter_id": "ch0318",
+   "number": 318,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0909,
+   "union_spans": 55,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0319",
+   "number": 319,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.0566,
+   "union_spans": 53,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0320",
+   "number": 320,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.0149,
+   "union_spans": 67,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0321",
+   "number": 321,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0455,
+   "union_spans": 66,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0322",
+   "number": 322,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.1507,
+   "union_spans": 73,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0323",
+   "number": 323,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.1279,
+   "union_spans": 86,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0325",
+   "number": 325,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.1846,
+   "union_spans": 65,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0326",
+   "number": 326,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 6,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0328",
+   "number": 328,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1176,
+   "union_spans": 17,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0329",
+   "number": 329,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0,
+   "union_spans": 16,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0330",
+   "number": 330,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.3684,
+   "union_spans": 19,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0331",
+   "number": 331,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.1053,
+   "union_spans": 19,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0332",
+   "number": 332,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.3077,
+   "union_spans": 13,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0333",
+   "number": 333,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0833,
+   "union_spans": 12,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0334",
+   "number": 334,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.2632,
+   "union_spans": 38,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0336",
+   "number": 336,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.5769,
+   "union_spans": 52,
+   "uncertain_spans": 30
+  },
+  {
+   "chapter_id": "ch0337",
+   "number": 337,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.2,
+   "union_spans": 35,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0338",
+   "number": 338,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.175,
+   "union_spans": 40,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0339",
+   "number": 339,
+   "list": "B",
+   "signal_a": 17,
+   "signal_b": 0.35,
+   "union_spans": 40,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0340",
+   "number": 340,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0909,
+   "union_spans": 22,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0341",
+   "number": 341,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0426,
+   "union_spans": 47,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0342",
+   "number": 342,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.2045,
+   "union_spans": 44,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0343",
+   "number": 343,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0161,
+   "union_spans": 62,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0344",
+   "number": 344,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 67,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0346",
+   "number": 346,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 56,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0348",
+   "number": 348,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 75,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0349",
+   "number": 349,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.1129,
+   "union_spans": 62,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0350",
+   "number": 350,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0,
+   "union_spans": 74,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0351",
+   "number": 351,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0328,
+   "union_spans": 61,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0352",
+   "number": 352,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.0678,
+   "union_spans": 59,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0354",
+   "number": 354,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0,
+   "union_spans": 74,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0355",
+   "number": 355,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0405,
+   "union_spans": 74,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0356",
+   "number": 356,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0556,
+   "union_spans": 72,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0357",
+   "number": 357,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.1233,
+   "union_spans": 73,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0359",
+   "number": 359,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0,
+   "union_spans": 77,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0360",
+   "number": 360,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 80,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0361",
+   "number": 361,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0341,
+   "union_spans": 88,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0362",
+   "number": 362,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 81,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0363",
+   "number": 363,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0649,
+   "union_spans": 77,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0364",
+   "number": 364,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0185,
+   "union_spans": 54,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0365",
+   "number": 365,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0778,
+   "union_spans": 90,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0367",
+   "number": 367,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.5469,
+   "union_spans": 64,
+   "uncertain_spans": 35
+  },
+  {
+   "chapter_id": "ch0369",
+   "number": 369,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.5294,
+   "union_spans": 85,
+   "uncertain_spans": 45
+  },
+  {
+   "chapter_id": "ch0370",
+   "number": 370,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1731,
+   "union_spans": 52,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0371",
+   "number": 371,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.1905,
+   "union_spans": 63,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0372",
+   "number": 372,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1351,
+   "union_spans": 37,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0373",
+   "number": 373,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.3881,
+   "union_spans": 67,
+   "uncertain_spans": 26
+  },
+  {
+   "chapter_id": "ch0374",
+   "number": 374,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.1379,
+   "union_spans": 58,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0375",
+   "number": 375,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2273,
+   "union_spans": 44,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0376",
+   "number": 376,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.3095,
+   "union_spans": 42,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0377",
+   "number": 377,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.1698,
+   "union_spans": 53,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0378",
+   "number": 378,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0282,
+   "union_spans": 71,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0381",
+   "number": 381,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0556,
+   "union_spans": 18,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0382",
+   "number": 382,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0526,
+   "union_spans": 38,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0383",
+   "number": 383,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.1515,
+   "union_spans": 66,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0385",
+   "number": 385,
+   "list": "B",
+   "signal_a": 2,
+   "signal_b": 0.25,
+   "union_spans": 48,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0386",
+   "number": 386,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.1964,
+   "union_spans": 56,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0387",
+   "number": 387,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.2,
+   "union_spans": 55,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0388",
+   "number": 388,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.1111,
+   "union_spans": 54,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0389",
+   "number": 389,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.0,
+   "union_spans": 31,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0390",
+   "number": 390,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1385,
+   "union_spans": 65,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0391",
+   "number": 391,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.0533,
+   "union_spans": 75,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0392",
+   "number": 392,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.0918,
+   "union_spans": 98,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0393",
+   "number": 393,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.1707,
+   "union_spans": 41,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0394",
+   "number": 394,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.2553,
+   "union_spans": 47,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0395",
+   "number": 395,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0364,
+   "union_spans": 55,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0396",
+   "number": 396,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0323,
+   "union_spans": 62,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0397",
+   "number": 397,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0781,
+   "union_spans": 64,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0398",
+   "number": 398,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.06,
+   "union_spans": 50,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0399",
+   "number": 399,
+   "list": "B",
+   "signal_a": 0,
+   "signal_b": 0.2581,
+   "union_spans": 31,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0400",
+   "number": 400,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.2027,
+   "union_spans": 74,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0401",
+   "number": 401,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0976,
+   "union_spans": 41,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0402",
+   "number": 402,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.1186,
+   "union_spans": 59,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0403",
+   "number": 403,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.1449,
+   "union_spans": 69,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0405",
+   "number": 405,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0784,
+   "union_spans": 51,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0406",
+   "number": 406,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0333,
+   "union_spans": 30,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0407",
+   "number": 407,
+   "list": "A",
+   "signal_a": 31,
+   "signal_b": 0.2903,
+   "union_spans": 62,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0408",
+   "number": 408,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.1071,
+   "union_spans": 56,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0409",
+   "number": 409,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.087,
+   "union_spans": 46,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0411",
+   "number": 411,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.175,
+   "union_spans": 40,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0412",
+   "number": 412,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.0408,
+   "union_spans": 49,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0414",
+   "number": 414,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2667,
+   "union_spans": 45,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0415",
+   "number": 415,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0816,
+   "union_spans": 49,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0416",
+   "number": 416,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.2549,
+   "union_spans": 51,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0417",
+   "number": 417,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0909,
+   "union_spans": 55,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0418",
+   "number": 418,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.0625,
+   "union_spans": 64,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0419",
+   "number": 419,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.3857,
+   "union_spans": 70,
+   "uncertain_spans": 27
+  },
+  {
+   "chapter_id": "ch0420",
+   "number": 420,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.2121,
+   "union_spans": 33,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0422",
+   "number": 422,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 46,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0423",
+   "number": 423,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 50,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0425",
+   "number": 425,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0345,
+   "union_spans": 29,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0426",
+   "number": 426,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0125,
+   "union_spans": 80,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0427",
+   "number": 427,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 91,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0429",
+   "number": 429,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.1509,
+   "union_spans": 53,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0430",
+   "number": 430,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0563,
+   "union_spans": 71,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0431",
+   "number": 431,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.1321,
+   "union_spans": 53,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0433",
+   "number": 433,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.1026,
+   "union_spans": 78,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0434",
+   "number": 434,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0349,
+   "union_spans": 86,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0435",
+   "number": 435,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0,
+   "union_spans": 63,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0436",
+   "number": 436,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0984,
+   "union_spans": 61,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0438",
+   "number": 438,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0,
+   "union_spans": 76,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0439",
+   "number": 439,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0,
+   "union_spans": 82,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0440",
+   "number": 440,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0128,
+   "union_spans": 78,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0441",
+   "number": 441,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0385,
+   "union_spans": 78,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0442",
+   "number": 442,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1528,
+   "union_spans": 72,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0443",
+   "number": 443,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.122,
+   "union_spans": 82,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0445",
+   "number": 445,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0594,
+   "union_spans": 101,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0446",
+   "number": 446,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.0111,
+   "union_spans": 90,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0448",
+   "number": 448,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.013,
+   "union_spans": 77,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0452",
+   "number": 452,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.2714,
+   "union_spans": 70,
+   "uncertain_spans": 19
+  },
+  {
+   "chapter_id": "ch0453",
+   "number": 453,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0588,
+   "union_spans": 85,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0454",
+   "number": 454,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1594,
+   "union_spans": 69,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0455",
+   "number": 455,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0429,
+   "union_spans": 70,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0456",
+   "number": 456,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.0,
+   "union_spans": 56,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0457",
+   "number": 457,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.02,
+   "union_spans": 50,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0458",
+   "number": 458,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0685,
+   "union_spans": 73,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0459",
+   "number": 459,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.0,
+   "union_spans": 89,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0460",
+   "number": 460,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0595,
+   "union_spans": 84,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0461",
+   "number": 461,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.2,
+   "union_spans": 70,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0462",
+   "number": 462,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0698,
+   "union_spans": 43,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0463",
+   "number": 463,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0256,
+   "union_spans": 39,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0464",
+   "number": 464,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.2281,
+   "union_spans": 57,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0466",
+   "number": 466,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0,
+   "union_spans": 36,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0467",
+   "number": 467,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.0667,
+   "union_spans": 60,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0468",
+   "number": 468,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0541,
+   "union_spans": 37,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0470",
+   "number": 470,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1111,
+   "union_spans": 18,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0471",
+   "number": 471,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.2143,
+   "union_spans": 28,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0472",
+   "number": 472,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.2432,
+   "union_spans": 37,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0473",
+   "number": 473,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 55,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0474",
+   "number": 474,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.1169,
+   "union_spans": 77,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0475",
+   "number": 475,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.1311,
+   "union_spans": 61,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0476",
+   "number": 476,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.4182,
+   "union_spans": 55,
+   "uncertain_spans": 23
+  },
+  {
+   "chapter_id": "ch0477",
+   "number": 477,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0,
+   "union_spans": 73,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0478",
+   "number": 478,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.16,
+   "union_spans": 50,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0479",
+   "number": 479,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1549,
+   "union_spans": 71,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0480",
+   "number": 480,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 24,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0481",
+   "number": 481,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.5233,
+   "union_spans": 86,
+   "uncertain_spans": 45
+  },
+  {
+   "chapter_id": "ch0483",
+   "number": 483,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.1975,
+   "union_spans": 81,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0484",
+   "number": 484,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.3281,
+   "union_spans": 64,
+   "uncertain_spans": 21
+  },
+  {
+   "chapter_id": "ch0485",
+   "number": 485,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.0312,
+   "union_spans": 64,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0486",
+   "number": 486,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.125,
+   "union_spans": 40,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0488",
+   "number": 488,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.075,
+   "union_spans": 40,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0489",
+   "number": 489,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0222,
+   "union_spans": 45,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0490",
+   "number": 490,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0952,
+   "union_spans": 42,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0491",
+   "number": 491,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.1818,
+   "union_spans": 22,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0492",
+   "number": 492,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.05,
+   "union_spans": 20,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0493",
+   "number": 493,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 28,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0494",
+   "number": 494,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0,
+   "union_spans": 28,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0496",
+   "number": 496,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.1786,
+   "union_spans": 28,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0497",
+   "number": 497,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.1212,
+   "union_spans": 33,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0498",
+   "number": 498,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.25,
+   "union_spans": 24,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0499",
+   "number": 499,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1304,
+   "union_spans": 46,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0500",
+   "number": 500,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0732,
+   "union_spans": 41,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0501",
+   "number": 501,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0517,
+   "union_spans": 58,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0502",
+   "number": 502,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0465,
+   "union_spans": 43,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0503",
+   "number": 503,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0312,
+   "union_spans": 32,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0504",
+   "number": 504,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0323,
+   "union_spans": 31,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0505",
+   "number": 505,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.4035,
+   "union_spans": 57,
+   "uncertain_spans": 23
+  },
+  {
+   "chapter_id": "ch0507",
+   "number": 507,
+   "list": "B",
+   "signal_a": 2,
+   "signal_b": 0.2759,
+   "union_spans": 29,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0508",
+   "number": 508,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 16,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0509",
+   "number": 509,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.027,
+   "union_spans": 37,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0510",
+   "number": 510,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.125,
+   "union_spans": 24,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0511",
+   "number": 511,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0465,
+   "union_spans": 43,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0512",
+   "number": 512,
+   "list": "B",
+   "signal_a": 2,
+   "signal_b": 0.2097,
+   "union_spans": 62,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0513",
+   "number": 513,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.137,
+   "union_spans": 73,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0514",
+   "number": 514,
+   "list": "B",
+   "signal_a": 1,
+   "signal_b": 0.2564,
+   "union_spans": 39,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0515",
+   "number": 515,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.2597,
+   "union_spans": 77,
+   "uncertain_spans": 20
+  },
+  {
+   "chapter_id": "ch0516",
+   "number": 516,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.1077,
+   "union_spans": 65,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0520",
+   "number": 520,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.1273,
+   "union_spans": 55,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0521",
+   "number": 521,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1522,
+   "union_spans": 46,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0523",
+   "number": 523,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0816,
+   "union_spans": 49,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0524",
+   "number": 524,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 42,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0525",
+   "number": 525,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0862,
+   "union_spans": 58,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0526",
+   "number": 526,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.0159,
+   "union_spans": 63,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0528",
+   "number": 528,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 68,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0529",
+   "number": 529,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0,
+   "union_spans": 30,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0530",
+   "number": 530,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0222,
+   "union_spans": 45,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0531",
+   "number": 531,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0556,
+   "union_spans": 54,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0532",
+   "number": 532,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.0656,
+   "union_spans": 61,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0534",
+   "number": 534,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0492,
+   "union_spans": 61,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0535",
+   "number": 535,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.102,
+   "union_spans": 49,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0536",
+   "number": 536,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0833,
+   "union_spans": 24,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0537",
+   "number": 537,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0,
+   "union_spans": 46,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0538",
+   "number": 538,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0638,
+   "union_spans": 47,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0539",
+   "number": 539,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.1212,
+   "union_spans": 66,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0540",
+   "number": 540,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.1475,
+   "union_spans": 61,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0541",
+   "number": 541,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.129,
+   "union_spans": 62,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0542",
+   "number": 542,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.0317,
+   "union_spans": 63,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0543",
+   "number": 543,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.1731,
+   "union_spans": 52,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0544",
+   "number": 544,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.3902,
+   "union_spans": 41,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0545",
+   "number": 545,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.0833,
+   "union_spans": 48,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0547",
+   "number": 547,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0179,
+   "union_spans": 56,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0549",
+   "number": 549,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0,
+   "union_spans": 43,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0550",
+   "number": 550,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.0,
+   "union_spans": 30,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0551",
+   "number": 551,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 39,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0552",
+   "number": 552,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0455,
+   "union_spans": 44,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0553",
+   "number": 553,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0217,
+   "union_spans": 46,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0555",
+   "number": 555,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0,
+   "union_spans": 46,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0556",
+   "number": 556,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.0909,
+   "union_spans": 66,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0557",
+   "number": 557,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0909,
+   "union_spans": 66,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0558",
+   "number": 558,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0267,
+   "union_spans": 75,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0560",
+   "number": 560,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0,
+   "union_spans": 37,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0561",
+   "number": 561,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.0154,
+   "union_spans": 65,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0562",
+   "number": 562,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.0364,
+   "union_spans": 55,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0563",
+   "number": 563,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.0566,
+   "union_spans": 53,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0564",
+   "number": 564,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.0,
+   "union_spans": 38,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0566",
+   "number": 566,
+   "list": "A",
+   "signal_a": 36,
+   "signal_b": 0.7573,
+   "union_spans": 103,
+   "uncertain_spans": 78
+  },
+  {
+   "chapter_id": "ch0567",
+   "number": 567,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.0,
+   "union_spans": 33,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0568",
+   "number": 568,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1176,
+   "union_spans": 34,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0569",
+   "number": 569,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.2118,
+   "union_spans": 85,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0570",
+   "number": 570,
+   "list": "A",
+   "signal_a": 25,
+   "signal_b": 0.3448,
+   "union_spans": 58,
+   "uncertain_spans": 20
+  },
+  {
+   "chapter_id": "ch0571",
+   "number": 571,
+   "list": "A",
+   "signal_a": 27,
+   "signal_b": 0.3,
+   "union_spans": 50,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0572",
+   "number": 572,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.602,
+   "union_spans": 98,
+   "uncertain_spans": 59
+  },
+  {
+   "chapter_id": "ch0573",
+   "number": 573,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.0943,
+   "union_spans": 53,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0575",
+   "number": 575,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.0588,
+   "union_spans": 85,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0577",
+   "number": 577,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.0741,
+   "union_spans": 54,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0578",
+   "number": 578,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.1649,
+   "union_spans": 97,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0579",
+   "number": 579,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0435,
+   "union_spans": 46,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0580",
+   "number": 580,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.0889,
+   "union_spans": 45,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0583",
+   "number": 583,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.1132,
+   "union_spans": 53,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0585",
+   "number": 585,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.1282,
+   "union_spans": 78,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0586",
+   "number": 586,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.0667,
+   "union_spans": 60,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0587",
+   "number": 587,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.1064,
+   "union_spans": 47,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0588",
+   "number": 588,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.25,
+   "union_spans": 48,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0590",
+   "number": 590,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0732,
+   "union_spans": 41,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0591",
+   "number": 591,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.0238,
+   "union_spans": 42,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0592",
+   "number": 592,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.033,
+   "union_spans": 91,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0593",
+   "number": 593,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.0769,
+   "union_spans": 39,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0595",
+   "number": 595,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.3214,
+   "union_spans": 112,
+   "uncertain_spans": 36
+  },
+  {
+   "chapter_id": "ch0596",
+   "number": 596,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.2466,
+   "union_spans": 73,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0597",
+   "number": 597,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.407,
+   "union_spans": 86,
+   "uncertain_spans": 35
+  },
+  {
+   "chapter_id": "ch0598",
+   "number": 598,
+   "list": "B",
+   "signal_a": 15,
+   "signal_b": 0.2456,
+   "union_spans": 57,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0599",
+   "number": 599,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.5342,
+   "union_spans": 73,
+   "uncertain_spans": 39
+  },
+  {
+   "chapter_id": "ch0600",
+   "number": 600,
+   "list": "A",
+   "signal_a": 27,
+   "signal_b": 0.402,
+   "union_spans": 102,
+   "uncertain_spans": 41
+  },
+  {
+   "chapter_id": "ch0601",
+   "number": 601,
+   "list": "A",
+   "signal_a": 32,
+   "signal_b": 0.1954,
+   "union_spans": 87,
+   "uncertain_spans": 17
+  },
+  {
+   "chapter_id": "ch0602",
+   "number": 602,
+   "list": "A",
+   "signal_a": 32,
+   "signal_b": 0.0792,
+   "union_spans": 101,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0603",
+   "number": 603,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.1918,
+   "union_spans": 73,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0604",
+   "number": 604,
+   "list": "A",
+   "signal_a": 38,
+   "signal_b": 0.2353,
+   "union_spans": 85,
+   "uncertain_spans": 20
+  },
+  {
+   "chapter_id": "ch0605",
+   "number": 605,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.0351,
+   "union_spans": 57,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0606",
+   "number": 606,
+   "list": "A",
+   "signal_a": 35,
+   "signal_b": 0.1579,
+   "union_spans": 76,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0608",
+   "number": 608,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.1026,
+   "union_spans": 78,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0609",
+   "number": 609,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0278,
+   "union_spans": 36,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0610",
+   "number": 610,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.1724,
+   "union_spans": 87,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0611",
+   "number": 611,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.0105,
+   "union_spans": 95,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0612",
+   "number": 612,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.0306,
+   "union_spans": 98,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0613",
+   "number": 613,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1519,
+   "union_spans": 79,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0615",
+   "number": 615,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1228,
+   "union_spans": 57,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0616",
+   "number": 616,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.0,
+   "union_spans": 31,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0618",
+   "number": 618,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1481,
+   "union_spans": 27,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0619",
+   "number": 619,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0,
+   "union_spans": 26,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0620",
+   "number": 620,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 34,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0621",
+   "number": 621,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.05,
+   "union_spans": 40,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0623",
+   "number": 623,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 14,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0624",
+   "number": 624,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0303,
+   "union_spans": 33,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0625",
+   "number": 625,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.1875,
+   "union_spans": 32,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0626",
+   "number": 626,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 25,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0627",
+   "number": 627,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0667,
+   "union_spans": 30,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0628",
+   "number": 628,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1154,
+   "union_spans": 26,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0629",
+   "number": 629,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0,
+   "union_spans": 68,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0630",
+   "number": 630,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.0727,
+   "union_spans": 55,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0631",
+   "number": 631,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.0652,
+   "union_spans": 46,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0632",
+   "number": 632,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0333,
+   "union_spans": 60,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0633",
+   "number": 633,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.0256,
+   "union_spans": 39,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0634",
+   "number": 634,
+   "list": "B",
+   "signal_a": 13,
+   "signal_b": 0.2439,
+   "union_spans": 41,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0635",
+   "number": 635,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.2791,
+   "union_spans": 43,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0638",
+   "number": 638,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.4419,
+   "union_spans": 43,
+   "uncertain_spans": 19
+  },
+  {
+   "chapter_id": "ch0639",
+   "number": 639,
+   "list": "A",
+   "signal_a": 23,
+   "signal_b": 0.2182,
+   "union_spans": 55,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0640",
+   "number": 640,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.2254,
+   "union_spans": 71,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0641",
+   "number": 641,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.3846,
+   "union_spans": 26,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0642",
+   "number": 642,
+   "list": "B",
+   "signal_a": 9,
+   "signal_b": 0.3061,
+   "union_spans": 49,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0643",
+   "number": 643,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.12,
+   "union_spans": 50,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0644",
+   "number": 644,
+   "list": "A",
+   "signal_a": 26,
+   "signal_b": 0.1392,
+   "union_spans": 79,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0645",
+   "number": 645,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.2766,
+   "union_spans": 47,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0646",
+   "number": 646,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.0167,
+   "union_spans": 60,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0647",
+   "number": 647,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.0606,
+   "union_spans": 66,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0648",
+   "number": 648,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.1667,
+   "union_spans": 36,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0650",
+   "number": 650,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.2,
+   "union_spans": 15,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0651",
+   "number": 651,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.0909,
+   "union_spans": 33,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0652",
+   "number": 652,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.0,
+   "union_spans": 32,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0653",
+   "number": 653,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2683,
+   "union_spans": 41,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0655",
+   "number": 655,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.1613,
+   "union_spans": 62,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0656",
+   "number": 656,
+   "list": "B",
+   "signal_a": 10,
+   "signal_b": 0.3284,
+   "union_spans": 67,
+   "uncertain_spans": 22
+  },
+  {
+   "chapter_id": "ch0657",
+   "number": 657,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.0633,
+   "union_spans": 79,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0658",
+   "number": 658,
+   "list": "A",
+   "signal_a": 22,
+   "signal_b": 0.2462,
+   "union_spans": 65,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0659",
+   "number": 659,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1071,
+   "union_spans": 56,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0660",
+   "number": 660,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.1333,
+   "union_spans": 45,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0661",
+   "number": 661,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.069,
+   "union_spans": 58,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0662",
+   "number": 662,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.1311,
+   "union_spans": 61,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0663",
+   "number": 663,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2727,
+   "union_spans": 33,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0665",
+   "number": 665,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.2941,
+   "union_spans": 51,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0666",
+   "number": 666,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.1519,
+   "union_spans": 79,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0667",
+   "number": 667,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2373,
+   "union_spans": 59,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0669",
+   "number": 669,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 36,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0672",
+   "number": 672,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0909,
+   "union_spans": 55,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0673",
+   "number": 673,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 48,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0674",
+   "number": 674,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1538,
+   "union_spans": 26,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0677",
+   "number": 677,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0,
+   "union_spans": 46,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0678",
+   "number": 678,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0204,
+   "union_spans": 49,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0679",
+   "number": 679,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0,
+   "union_spans": 28,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0680",
+   "number": 680,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0769,
+   "union_spans": 26,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0681",
+   "number": 681,
+   "list": "B",
+   "signal_a": 3,
+   "signal_b": 0.3529,
+   "union_spans": 34,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0682",
+   "number": 682,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1429,
+   "union_spans": 28,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0683",
+   "number": 683,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0,
+   "union_spans": 24,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0685",
+   "number": 685,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 27,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0686",
+   "number": 686,
+   "list": null,
+   "signal_a": 9,
+   "signal_b": 0.0,
+   "union_spans": 45,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0687",
+   "number": 687,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1538,
+   "union_spans": 26,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0688",
+   "number": 688,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.125,
+   "union_spans": 24,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0689",
+   "number": 689,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1714,
+   "union_spans": 35,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0690",
+   "number": 690,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1538,
+   "union_spans": 39,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0691",
+   "number": 691,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.2364,
+   "union_spans": 55,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0692",
+   "number": 692,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.122,
+   "union_spans": 41,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0693",
+   "number": 693,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.1481,
+   "union_spans": 54,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0694",
+   "number": 694,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.0303,
+   "union_spans": 33,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0695",
+   "number": 695,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.1364,
+   "union_spans": 44,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0696",
+   "number": 696,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.1364,
+   "union_spans": 66,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0698",
+   "number": 698,
+   "list": "B",
+   "signal_a": 6,
+   "signal_b": 0.2456,
+   "union_spans": 57,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0699",
+   "number": 699,
+   "list": "A",
+   "signal_a": 34,
+   "signal_b": 0.1695,
+   "union_spans": 59,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0701",
+   "number": 701,
+   "list": "B",
+   "signal_a": 14,
+   "signal_b": 0.3514,
+   "union_spans": 74,
+   "uncertain_spans": 26
+  },
+  {
+   "chapter_id": "ch0702",
+   "number": 702,
+   "list": "B",
+   "signal_a": 14,
+   "signal_b": 0.3077,
+   "union_spans": 65,
+   "uncertain_spans": 20
+  },
+  {
+   "chapter_id": "ch0704",
+   "number": 704,
+   "list": "A",
+   "signal_a": 28,
+   "signal_b": 0.0299,
+   "union_spans": 67,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0705",
+   "number": 705,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1379,
+   "union_spans": 58,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0706",
+   "number": 706,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.0172,
+   "union_spans": 58,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0707",
+   "number": 707,
+   "list": "A",
+   "signal_a": 31,
+   "signal_b": 0.4416,
+   "union_spans": 77,
+   "uncertain_spans": 34
+  },
+  {
+   "chapter_id": "ch0708",
+   "number": 708,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 33,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0710",
+   "number": 710,
+   "list": "B",
+   "signal_a": 7,
+   "signal_b": 0.2462,
+   "union_spans": 65,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0711",
+   "number": 711,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.1525,
+   "union_spans": 59,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0712",
+   "number": 712,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.55,
+   "union_spans": 60,
+   "uncertain_spans": 33
+  },
+  {
+   "chapter_id": "ch0713",
+   "number": 713,
+   "list": null,
+   "signal_a": 5,
+   "signal_b": 0.1622,
+   "union_spans": 37,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0714",
+   "number": 714,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0893,
+   "union_spans": 56,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0716",
+   "number": 716,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1667,
+   "union_spans": 18,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0717",
+   "number": 717,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.0385,
+   "union_spans": 52,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0720",
+   "number": 720,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.2466,
+   "union_spans": 73,
+   "uncertain_spans": 18
+  },
+  {
+   "chapter_id": "ch0721",
+   "number": 721,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.0351,
+   "union_spans": 57,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0722",
+   "number": 722,
+   "list": "A",
+   "signal_a": 18,
+   "signal_b": 0.14,
+   "union_spans": 50,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0723",
+   "number": 723,
+   "list": null,
+   "signal_a": 16,
+   "signal_b": 0.0345,
+   "union_spans": 58,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0724",
+   "number": 724,
+   "list": "A",
+   "signal_a": 21,
+   "signal_b": 0.1731,
+   "union_spans": 52,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0725",
+   "number": 725,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0513,
+   "union_spans": 39,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0726",
+   "number": 726,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.1489,
+   "union_spans": 47,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0727",
+   "number": 727,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0714,
+   "union_spans": 42,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0728",
+   "number": 728,
+   "list": null,
+   "signal_a": 8,
+   "signal_b": 0.1395,
+   "union_spans": 43,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0730",
+   "number": 730,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.15,
+   "union_spans": 40,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0732",
+   "number": 732,
+   "list": "A",
+   "signal_a": 19,
+   "signal_b": 0.2,
+   "union_spans": 50,
+   "uncertain_spans": 10
+  },
+  {
+   "chapter_id": "ch0734",
+   "number": 734,
+   "list": "B",
+   "signal_a": 17,
+   "signal_b": 0.2059,
+   "union_spans": 68,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0735",
+   "number": 735,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.0755,
+   "union_spans": 53,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0736",
+   "number": 736,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.1636,
+   "union_spans": 55,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0737",
+   "number": 737,
+   "list": "B",
+   "signal_a": 8,
+   "signal_b": 0.5417,
+   "union_spans": 24,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0739",
+   "number": 739,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.1463,
+   "union_spans": 41,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0740",
+   "number": 740,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.2333,
+   "union_spans": 30,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0741",
+   "number": 741,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.4898,
+   "union_spans": 49,
+   "uncertain_spans": 24
+  },
+  {
+   "chapter_id": "ch0744",
+   "number": 744,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.0682,
+   "union_spans": 44,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0746",
+   "number": 746,
+   "list": null,
+   "signal_a": 7,
+   "signal_b": 0.1053,
+   "union_spans": 38,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0747",
+   "number": 747,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0,
+   "union_spans": 51,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0748",
+   "number": 748,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0278,
+   "union_spans": 72,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0749",
+   "number": 749,
+   "list": null,
+   "signal_a": 6,
+   "signal_b": 0.0147,
+   "union_spans": 68,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0750",
+   "number": 750,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0303,
+   "union_spans": 33,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0751",
+   "number": 751,
+   "list": null,
+   "signal_a": 4,
+   "signal_b": 0.0364,
+   "union_spans": 55,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0753",
+   "number": 753,
+   "list": null,
+   "signal_a": 15,
+   "signal_b": 0.1429,
+   "union_spans": 56,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0754",
+   "number": 754,
+   "list": "A",
+   "signal_a": 24,
+   "signal_b": 0.2273,
+   "union_spans": 66,
+   "uncertain_spans": 15
+  },
+  {
+   "chapter_id": "ch0755",
+   "number": 755,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.1818,
+   "union_spans": 66,
+   "uncertain_spans": 12
+  },
+  {
+   "chapter_id": "ch0757",
+   "number": 757,
+   "list": "B",
+   "signal_a": 16,
+   "signal_b": 0.5714,
+   "union_spans": 63,
+   "uncertain_spans": 36
+  },
+  {
+   "chapter_id": "ch0758",
+   "number": 758,
+   "list": null,
+   "signal_a": 10,
+   "signal_b": 0.08,
+   "union_spans": 75,
+   "uncertain_spans": 6
+  },
+  {
+   "chapter_id": "ch0760",
+   "number": 760,
+   "list": "B",
+   "signal_a": 11,
+   "signal_b": 0.3582,
+   "union_spans": 67,
+   "uncertain_spans": 24
+  },
+  {
+   "chapter_id": "ch0761",
+   "number": 761,
+   "list": null,
+   "signal_a": 17,
+   "signal_b": 0.1667,
+   "union_spans": 66,
+   "uncertain_spans": 11
+  },
+  {
+   "chapter_id": "ch0762",
+   "number": 762,
+   "list": null,
+   "signal_a": 11,
+   "signal_b": 0.0119,
+   "union_spans": 84,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0763",
+   "number": 763,
+   "list": null,
+   "signal_a": 14,
+   "signal_b": 0.1951,
+   "union_spans": 41,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0764",
+   "number": 764,
+   "list": "B",
+   "signal_a": 5,
+   "signal_b": 0.3333,
+   "union_spans": 39,
+   "uncertain_spans": 13
+  },
+  {
+   "chapter_id": "ch0765",
+   "number": 765,
+   "list": null,
+   "signal_a": 12,
+   "signal_b": 0.1975,
+   "union_spans": 81,
+   "uncertain_spans": 16
+  },
+  {
+   "chapter_id": "ch0766",
+   "number": 766,
+   "list": null,
+   "signal_a": 13,
+   "signal_b": 0.16,
+   "union_spans": 50,
+   "uncertain_spans": 8
+  },
+  {
+   "chapter_id": "ch0767",
+   "number": 767,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1186,
+   "union_spans": 59,
+   "uncertain_spans": 7
+  },
+  {
+   "chapter_id": "ch0768",
+   "number": 768,
+   "list": "B",
+   "signal_a": 2,
+   "signal_b": 0.3111,
+   "union_spans": 45,
+   "uncertain_spans": 14
+  },
+  {
+   "chapter_id": "ch0769",
+   "number": 769,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.08,
+   "union_spans": 25,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0770",
+   "number": 770,
+   "list": null,
+   "signal_a": 3,
+   "signal_b": 0.0625,
+   "union_spans": 16,
+   "uncertain_spans": 1
+  },
+  {
+   "chapter_id": "ch0771",
+   "number": 771,
+   "list": "B",
+   "signal_a": 12,
+   "signal_b": 0.5111,
+   "union_spans": 45,
+   "uncertain_spans": 23
+  },
+  {
+   "chapter_id": "ch0772",
+   "number": 772,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0,
+   "union_spans": 24,
+   "uncertain_spans": 0
+  },
+  {
+   "chapter_id": "ch0773",
+   "number": 773,
+   "list": "B",
+   "signal_a": 4,
+   "signal_b": 0.2195,
+   "union_spans": 41,
+   "uncertain_spans": 9
+  },
+  {
+   "chapter_id": "ch0774",
+   "number": 774,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.0541,
+   "union_spans": 37,
+   "uncertain_spans": 2
+  },
+  {
+   "chapter_id": "ch0775",
+   "number": 775,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.0909,
+   "union_spans": 33,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0776",
+   "number": 776,
+   "list": null,
+   "signal_a": 0,
+   "signal_b": 0.1163,
+   "union_spans": 43,
+   "uncertain_spans": 5
+  },
+  {
+   "chapter_id": "ch0778",
+   "number": 778,
+   "list": null,
+   "signal_a": 2,
+   "signal_b": 0.1333,
+   "union_spans": 30,
+   "uncertain_spans": 4
+  },
+  {
+   "chapter_id": "ch0779",
+   "number": 779,
+   "list": null,
+   "signal_a": 1,
+   "signal_b": 0.0714,
+   "union_spans": 42,
+   "uncertain_spans": 3
+  },
+  {
+   "chapter_id": "ch0780",
+   "number": 780,
+   "list": "A",
+   "signal_a": 20,
+   "signal_b": 0.3478,
+   "union_spans": 23,
+   "uncertain_spans": 8
+  }
+ ],
+ "strata": {
+  "s01": {
+   "numbers": [
+    1,
+    99
+   ],
+   "pool": 81,
+   "base_sampled": 12,
+   "new_a": 9,
+   "new_b": 13,
+   "new": 22
+  },
+  "s02": {
+   "numbers": [
+    100,
+    194
+   ],
+   "pool": 81,
+   "base_sampled": 13,
+   "new_a": 10,
+   "new_b": 16,
+   "new": 26
+  },
+  "s03": {
+   "numbers": [
+    195,
+    288
+   ],
+   "pool": 81,
+   "base_sampled": 12,
+   "new_a": 5,
+   "new_b": 15,
+   "new": 20
+  },
+  "s04": {
+   "numbers": [
+    289,
+    385
+   ],
+   "pool": 81,
+   "base_sampled": 13,
+   "new_a": 11,
+   "new_b": 10,
+   "new": 21
+  },
+  "s05": {
+   "numbers": [
+    386,
+    483
+   ],
+   "pool": 82,
+   "base_sampled": 12,
+   "new_a": 12,
+   "new_b": 11,
+   "new": 23
+  },
+  "s06": {
+   "numbers": [
+    484,
+    580
+   ],
+   "pool": 81,
+   "base_sampled": 12,
+   "new_a": 16,
+   "new_b": 6,
+   "new": 22
+  },
+  "s07": {
+   "numbers": [
+    581,
+    680
+   ],
+   "pool": 81,
+   "base_sampled": 13,
+   "new_a": 24,
+   "new_b": 13,
+   "new": 37
+  },
+  "s08": {
+   "numbers": [
+    681,
+    780
+   ],
+   "pool": 81,
+   "base_sampled": 13,
+   "new_a": 13,
+   "new_b": 16,
+   "new": 29
+  }
+ },
+ "overlap": {
+  "list_a_in_top_by_signal_b": 31,
+  "list_b_with_signal_a_at_cut_a": 2,
+  "list_b_with_signal_a_above_cut_a": 0,
+  "u_0": {
+   "pool": 1,
+   "list_a": 0,
+   "list_b": 0
+  },
+  "note": "list_a_in_top_by_signal_b: how many of A would also be in the top by signal_b over the whole pool; list_b_with_signal_a_at_cut_a: B chapters that missed A only by the tie rule"
+ },
+ "base_packs": [
+  "teach_b01",
+  "teach_b02",
+  "teach_b03",
+  "teach_b04",
+  "teach_b05",
+  "teach_b06",
+  "teach_b07",
+  "teach_b08",
+  "teach_b09",
+  "teach_b10",
+  "teach_b11",
+  "teach_b12",
+  "teach_b13",
+  "teach_b14",
+  "teach_b15",
+  "teach_b16",
+  "teach_b17",
+  "teach_b18",
+  "teach_b19",
+  "teach_b20"
+ ],
+ "new_packs": [
+  "teach_b21",
+  "teach_b22",
+  "teach_b23",
+  "teach_b24",
+  "teach_b25",
+  "teach_b26",
+  "teach_b27",
+  "teach_b28",
+  "teach_b29",
+  "teach_b30",
+  "teach_b31",
+  "teach_b32",
+  "teach_b33",
+  "teach_b34",
+  "teach_b35",
+  "teach_b36",
+  "teach_b37",
+  "teach_b38",
+  "teach_b39",
+  "teach_b40",
+  "teach_b41",
+  "teach_b42",
+  "teach_b43",
+  "teach_b44",
+  "teach_b45",
+  "teach_b46",
+  "teach_b47",
+  "teach_b48",
+  "teach_b49",
+  "teach_b50",
+  "teach_b51",
+  "teach_b52",
+  "teach_b53",
+  "teach_b54",
+  "teach_b55",
+  "teach_b56",
+  "teach_b57",
+  "teach_b58",
+  "teach_b59",
+  "teach_b60"
+ ],
+ "training_packs": [
+  "teach_b01",
+  "teach_b02",
+  "teach_b03",
+  "teach_b04",
+  "teach_b05",
+  "teach_b06",
+  "teach_b07",
+  "teach_b08",
+  "teach_b09",
+  "teach_b10",
+  "teach_b11",
+  "teach_b12",
+  "teach_b13",
+  "teach_b14",
+  "teach_b15",
+  "teach_b16",
+  "teach_b17",
+  "teach_b18",
+  "teach_b19",
+  "teach_b20",
+  "teach_b21",
+  "teach_b22",
+  "teach_b23",
+  "teach_b24",
+  "teach_b25",
+  "teach_b26",
+  "teach_b27",
+  "teach_b28",
+  "teach_b29",
+  "teach_b30",
+  "teach_b31",
+  "teach_b32",
+  "teach_b33",
+  "teach_b34",
+  "teach_b35",
+  "teach_b36",
+  "teach_b37",
+  "teach_b38",
+  "teach_b39",
+  "teach_b40",
+  "teach_b41",
+  "teach_b42",
+  "teach_b43",
+  "teach_b44",
+  "teach_b45",
+  "teach_b46",
+  "teach_b47",
+  "teach_b48",
+  "teach_b49",
+  "teach_b50",
+  "teach_b51",
+  "teach_b52",
+  "teach_b53",
+  "teach_b54",
+  "teach_b55",
+  "teach_b56",
+  "teach_b57",
+  "teach_b58",
+  "teach_b59",
+  "teach_b60"
+ ],
+ "dev_pack": null,
+ "packs": {
+  "teach_b01": [
+   "ch0345",
+   "ch0151",
+   "ch0676",
+   "ch0031",
+   "ch0715"
+  ],
+  "teach_b02": [
+   "ch0268",
+   "ch0533",
+   "ch0469",
+   "ch0347",
+   "ch0103"
+  ],
+  "teach_b03": [
+   "ch0671",
+   "ch0070",
+   "ch0697",
+   "ch0275",
+   "ch0527"
+  ],
+  "teach_b04": [
+   "ch0404",
+   "ch0298",
+   "ch0124",
+   "ch0675",
+   "ch0066"
+  ],
+  "teach_b05": [
+   "ch0759",
+   "ch0195",
+   "ch0506",
+   "ch0410",
+   "ch0335"
+  ],
+  "teach_b06": [
+   "ch0120",
+   "ch0670",
+   "ch0003",
+   "ch0731",
+   "ch0216"
+  ],
+  "teach_b07": [
+   "ch0519",
+   "ch0421",
+   "ch0293",
+   "ch0114",
+   "ch0581"
+  ],
+  "teach_b08": [
+   "ch0062",
+   "ch0729",
+   "ch0251",
+   "ch0574",
+   "ch0450"
+  ],
+  "teach_b09": [
+   "ch0368",
+   "ch0149",
+   "ch0622",
+   "ch0088",
+   "ch0752"
+  ],
+  "teach_b10": [
+   "ch0261",
+   "ch0495",
+   "ch0413",
+   "ch0353",
+   "ch0134"
+  ],
+  "teach_b11": [
+   "ch0636",
+   "ch0085",
+   "ch0742",
+   "ch0242",
+   "ch0576"
+  ],
+  "teach_b12": [
+   "ch0447",
+   "ch0358",
+   "ch0172",
+   "ch0582",
+   "ch0005"
+  ],
+  "teach_b13": [
+   "ch0703",
+   "ch0266",
+   "ch0548",
+   "ch0451",
+   "ch0379"
+  ],
+  "teach_b14": [
+   "ch0102",
+   "ch0584",
+   "ch0719",
+   "ch0052",
+   "ch0210"
+  ],
+  "teach_b15": [
+   "ch0559",
+   "ch0432",
+   "ch0300",
+   "ch0136",
+   "ch0614"
+  ],
+  "teach_b16": [
+   "ch0709",
+   "ch0039",
+   "ch0248",
+   "ch0565",
+   "ch0428"
+  ],
+  "teach_b17": [
+   "ch0380",
+   "ch0173",
+   "ch0617",
+   "ch0684",
+   "ch0083"
+  ],
+  "teach_b18": [
+   "ch0231",
+   "ch0517",
+   "ch0444",
+   "ch0384",
+   "ch0148"
+  ],
+  "teach_b19": [
+   "ch0594",
+   "ch0718",
+   "ch0016",
+   "ch0264",
+   "ch0546"
+  ],
+  "teach_b20": [
+   "ch0465",
+   "ch0327",
+   "ch0193",
+   "ch0649",
+   "ch0743"
+  ],
+  "teach_b21": [
+   "ch0288",
+   "ch0604",
+   "ch0566",
+   "ch0606",
+   "ch0699"
+  ],
+  "teach_b22": [
+   "ch0118",
+   "ch0601",
+   "ch0602",
+   "ch0037",
+   "ch0407"
+  ],
+  "teach_b23": [
+   "ch0707",
+   "ch0144",
+   "ch0317",
+   "ch0611",
+   "ch0631"
+  ],
+  "teach_b24": [
+   "ch0662",
+   "ch0665",
+   "ch0704",
+   "ch0076",
+   "ch0571"
+  ],
+  "teach_b25": [
+   "ch0600",
+   "ch0032",
+   "ch0475",
+   "ch0572",
+   "ch0595"
+  ],
+  "teach_b26": [
+   "ch0644",
+   "ch0058",
+   "ch0138",
+   "ch0241",
+   "ch0312"
+  ],
+  "teach_b27": [
+   "ch0570",
+   "ch0034",
+   "ch0391",
+   "ch0416",
+   "ch0575"
+  ],
+  "teach_b28": [
+   "ch0591",
+   "ch0592",
+   "ch0661",
+   "ch0666",
+   "ch0754"
+  ],
+  "teach_b29": [
+   "ch0290",
+   "ch0515",
+   "ch0526",
+   "ch0569",
+   "ch0597"
+  ],
+  "teach_b30": [
+   "ch0603",
+   "ch0639",
+   "ch0145",
+   "ch0169",
+   "ch0369"
+  ],
+  "teach_b31": [
+   "ch0646",
+   "ch0658",
+   "ch0059",
+   "ch0177",
+   "ch0313"
+  ],
+  "teach_b32": [
+   "ch0580",
+   "ch0638",
+   "ch0724",
+   "ch0159",
+   "ch0171"
+  ],
+  "teach_b33": [
+   "ch0180",
+   "ch0255",
+   "ch0446",
+   "ch0456",
+   "ch0520"
+  ],
+  "teach_b34": [
+   "ch0540",
+   "ch0583",
+   "ch0695",
+   "ch0712",
+   "ch0720"
+  ],
+  "teach_b35": [
+   "ch0780",
+   "ch0309",
+   "ch0373",
+   "ch0409",
+   "ch0461"
+  ],
+  "teach_b36": [
+   "ch0467",
+   "ch0496",
+   "ch0556",
+   "ch0640",
+   "ch0696"
+  ],
+  "teach_b37": [
+   "ch0732",
+   "ch0029",
+   "ch0139",
+   "ch0219",
+   "ch0289"
+  ],
+  "teach_b38": [
+   "ch0336",
+   "ch0383",
+   "ch0408",
+   "ch0464",
+   "ch0483"
+  ],
+  "teach_b39": [
+   "ch0505",
+   "ch0561",
+   "ch0577",
+   "ch0586",
+   "ch0721"
+  ],
+  "teach_b40": [
+   "ch0722",
+   "ch0026",
+   "ch0073",
+   "ch0240",
+   "ch0315"
+  ],
+  "teach_b41": [
+   "ch0757",
+   "ch0367",
+   "ch0737",
+   "ch0599",
+   "ch0155"
+  ],
+  "teach_b42": [
+   "ch0481",
+   "ch0771",
+   "ch0741",
+   "ch0060",
+   "ch0017"
+  ],
+  "teach_b43": [
+   "ch0281",
+   "ch0476",
+   "ch0043",
+   "ch0229",
+   "ch0544"
+  ],
+  "teach_b44": [
+   "ch0419",
+   "ch0163",
+   "ch0641",
+   "ch0157",
+   "ch0330"
+  ],
+  "teach_b45": [
+   "ch0119",
+   "ch0760",
+   "ch0681",
+   "ch0701",
+   "ch0339"
+  ],
+  "teach_b46": [
+   "ch0042",
+   "ch0202",
+   "ch0258",
+   "ch0269",
+   "ch0123"
+  ],
+  "teach_b47": [
+   "ch0267",
+   "ch0764",
+   "ch0656",
+   "ch0484",
+   "ch0162"
+  ],
+  "teach_b48": [
+   "ch0158",
+   "ch0002",
+   "ch0146",
+   "ch0768",
+   "ch0376"
+  ],
+  "teach_b49": [
+   "ch0332",
+   "ch0702",
+   "ch0082",
+   "ch0257",
+   "ch0642"
+  ],
+  "teach_b50": [
+   "ch0018",
+   "ch0273",
+   "ch0271",
+   "ch0074",
+   "ch0635"
+  ],
+  "teach_b51": [
+   "ch0153",
+   "ch0645",
+   "ch0507",
+   "ch0122",
+   "ch0663"
+  ],
+  "teach_b52": [
+   "ch0222",
+   "ch0452",
+   "ch0653",
+   "ch0414",
+   "ch0228"
+  ],
+  "teach_b53": [
+   "ch0334",
+   "ch0125",
+   "ch0227",
+   "ch0185",
+   "ch0399"
+  ],
+  "teach_b54": [
+   "ch0514",
+   "ch0394",
+   "ch0150",
+   "ch0385",
+   "ch0498"
+  ],
+  "teach_b55": [
+   "ch0588",
+   "ch0596",
+   "ch0710",
+   "ch0598",
+   "ch0698"
+  ],
+  "teach_b56": [
+   "ch0634",
+   "ch0472",
+   "ch0667",
+   "ch0691",
+   "ch0176"
+  ],
+  "teach_b57": [
+   "ch0740",
+   "ch0045",
+   "ch0375",
+   "ch0175",
+   "ch0081"
+  ],
+  "teach_b58": [
+   "ch0773",
+   "ch0024",
+   "ch0314",
+   "ch0471",
+   "ch0420"
+  ],
+  "teach_b59": [
+   "ch0512",
+   "ch0056",
+   "ch0207",
+   "ch0246",
+   "ch0160"
+  ],
+  "teach_b60": [
+   "ch0238",
+   "ch0048",
+   "ch0734",
+   "ch0342",
+   "ch0400"
+  ]
+ },
+ "created_at": "2026-10-04T14:10:31-0700"
+}

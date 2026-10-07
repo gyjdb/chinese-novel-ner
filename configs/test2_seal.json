@@ -1,0 +1,16 @@
+{
+ "status": "open",
+ "order": "configs/test2_996_1350.order.json",
+ "n": 40,
+ "sealed_at": "2026-10-04",
+ "sealed_by": "decision of 2026-10-04 (stage 0): test2 = the first 40 chapters of the order",
+ "rule": "While status is 'sealed', novel_ner.tagger predict, novel_ner.claude_run and novel_ner.codex_run (kind annotate) refuse any chapter among the first n of the order (checked by chapter id, whatever the run id). Making the answers is exempt (answer_making_exempt): the GPT drafting passes (novel_ner.gpt_api) and the adjudication of pending places by the reviewer model on the annotator's words (novel_ner.codex_run --kind adjudicate), because both produce the answers, neither is a compared system, and the adjudicator sees no system's output. The seal is opened only in stage 3, after the final method is frozen and committed, by changing status to 'open' in its own commit (record the commit here), and test2 is scored once.",
+ "opened_at": "2026-10-04T21:33:02-0700",
+ "opened_commit": "d2e0312904167f347e4a839e7719ee53c58bd33f",
+ "answer_making_exempt": [
+  "novel_ner.gpt_api (drafting passes A and B)",
+  "novel_ner.codex_run --kind adjudicate (GPT-6-Astra adjudicating the pending places with the annotator's answers; exemption decided 2026-10-04 so the test2 answers are made exactly like the test's and dev2's)",
+  "novel_ner.qa (independent quality check of the excluded places by GPT-6.1-Sol; it sees no system output and changes no answer by itself)"
+ ],
+ "opened_by": "decision of 2026-10-04 (stage 3, option 1): the final method and the evaluation plan were frozen in configs/stage3_final.json and the scoring chain committed at the commit named in opened_commit; test2 is scored once and is history afterwards"
+}

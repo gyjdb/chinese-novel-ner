@@ -1,0 +1,10 @@
+{
+ "description": "Annotation page for the development chapters (pilot and dev set; never part of the formal test). The 30 trial chapters come in a fixed shuffled order; extra_chapters were added later and go at the end. This file is the list of dev chapters: the formal test sample must exclude all of them.",
+ "set": "dev",
+ "snapshot": "to0990-79dc77f8d354",
+ "guide_version": "1.1",
+ "chapters_from_run": "runs/20260930-zs_gliner_trial/config.json",
+ "order_seed": 20260930,
+ "extra_chapters": ["ch0097"],
+ "extra_chapters_note": "ch0097: drafted by a model outside the original list, then reviewed, added 2026-10-01"
+}

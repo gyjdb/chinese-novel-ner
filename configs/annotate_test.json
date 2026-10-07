@@ -1,0 +1,8 @@
+{
+ "description": "Annotation page for the formal test (silver standard): the first n chapters of the stratified 781-990 order. Each chapter arrives prefilled from two GPT passes; the annotator only settles the pending marks.",
+ "set": "test",
+ "snapshot": "to0990-79dc77f8d354",
+ "guide_version": "1.1",
+ "chapters_from_order": "configs/test_781_990.order.json",
+ "n": 60
+}

@@ -1,0 +1,47 @@
+{
+ "description": "Stage 2: extend the teacher-labelled training set from 100 to 300 chapters. The 100 chapters of configs/teacher_train100.json and their Opus passes are kept as they are (reused byte for byte, sha256 recorded); 200 chapters are added from the pool, chosen by the fixed rule below (written and committed before the pool was ranked), prioritising non-person names and hard examples as planned. The training plan and the comparison are fixed here too. test2 stays sealed; large stays on hold until the 300-chapter results are in.",
+ "base_config": "configs/teacher_train100.json",
+ "base_chapters_file": "configs/teacher_train100.chapters.json",
+ "base_labels_build": "20261004-teacher100",
+ "snapshot": "to0990-79dc77f8d354",
+ "dev_config": "configs/annotate_dev.json",
+ "max_train_chapter": 780,
+ "exclude": {"test": "configs/test_781_990.json", "dev2": "configs/dev2_781_990.json", "test2": "configs/test2_996_1350.json"},
+ "pool_rule": "chapters 1..780 of the snapshot minus the 31 dev chapters minus the 100 chapters of the base chapters file (649 chapters)",
+ "n_new": 200,
+ "selection": {
+  "signal_a": {"name": "non_person_weak_spans", "rule": "number of positive spans whose type is not person in the weak S3 labels of the chapter (data/weak_labels/20261003-weak_v2/labels_S3.jsonl, split train; the record checks the file sha256 against runs/20261003-weak_v2/config.json). Pool spread when the rule was written: median 7, 90th percentile 20, max 39; the top 100 cut at 17."},
+  "signal_b": {"name": "student_uncertainty", "rule": "the three A2 models (runs/20261004-tag-T-s1-s1base, runs/20261004-tag-T-s2-s1base-e60, runs/20261004-tag-T-s3-s1base; the stage 1 teacher-label arm) predict every pool chapter (ordinary predict runs on training chapters, run ids <model run>-predict-pool649); per chapter u = (spans of the three seeds union that not all three seeds predicted + spans all three predicted whose lowest seed score is below 0.9) / (spans in the union); a chapter with fewer than 10 union spans gets u = 0 (too few to rank). This is LLMaAA-style uncertainty sampling on training text only: no answer file, dev2, test or test2 is read.", "low_score": 0.9, "min_union_spans": 10},
+  "rule": "list A = the 100 pool chapters with the highest signal_a (ties: lower chapter number first); list B = the 100 chapters with the highest signal_b among the pool minus list A (ties: lower chapter number first). The 200 new chapters = A then B, in that order, 5 per pack: packs teach_b21..teach_b40 are list A sorted by signal_a descending, teach_b41..teach_b60 list B sorted by signal_b descending. The record stores both signals for every pool chapter, the cut values, and the strata distribution (the 8 ranges of the base config) of the 200.",
+  "packs": {"prefix": "teach_b", "first_index": 21, "batch_size": 5}
+ },
+ "teacher": {"label": "opus_t1", "model": "claude-opus-5-5", "effort": "xhigh", "workers": 3, "note": "40 calls, one per package, about 5-6 min each at xhigh, 3 in parallel (about 1.3 h); the subscription covers the scale (2026-10-04); calls and durations recorded in runs/<run id>/claude_calls.json"},
+ "frozen": {"instructions_version": "v1", "guide_version": "1.1"},
+ "labels_build_id": "20261004-teacher300",
+ "labels_rule": "the same conversion as the 100-chapter build (novel_ner.teacher labels: positives from located mentions with a valid type; pending places and overlapping outputs become uncertain regions with all labels allowed); T = teacher labels of the 300 chapters (the 100 old passes and the 200 new ones), W = the weak S3 labels of the same 300 chapters (control). The report states, for the 200 new chapters and for the 300, the teacher spans by type, the pending count and share, invalid and overlap counts, and the agreement of the teacher with the weak labels by type.",
+ "training_plan": {
+  "routes": {
+   "R1": {"config": "configs/train_s2_base.json", "setting": "T", "what": "base backbone trained directly on the 300 teacher chapters"},
+   "R2": {"config": "configs/train_s2_base_ft.json", "setting": "T", "what": "base backbone starting from the S3 checkpoints (runs/20261003-tag-S3-s{seed}-dev31), fine-tuned on the 300 teacher chapters"},
+   "C": {"config": "configs/train_s2_base.json", "setting": "W", "what": "control: base backbone trained directly on the weak S3 labels of the same 300 chapters"}
+  },
+  "seeds": [1, 2, 3],
+  "schedule": "300 chapters give about 1500 windows, about 94 steps per epoch at batch 16; max_epochs 20 plans about 1880 steps (the 749-chapter S3 run planned 1410), dev (31 chapters) scored every epoch, patience 6, lr 3e-5, warmup 0.1; the sufficiency record of every run is read and a flagged run is re-run with a longer schedule as in stage 1",
+  "large": "on hold; decided after the 300-chapter results"
+ },
+ "comparison": {
+  "decision_set": "dev2 (data/gold/dev2/20261004-130201_guide-v1.1.json); the 60-chapter test is only reported; test2 stays sealed",
+  "metrics": ["micro F1", "non-person F1", "new-name recall (fixed rule, unseen by chapter 780)"],
+  "intervals": ["chapter-only (within plot units, 10000 rounds)", "chapters and runs (seed-aware)"],
+  "pairs": [["R1", "A2"], ["R2", "A3"], ["R2", "R1"], ["C", "A1"], ["R1", "C"], ["R2", "S3"], ["opus_t1", "R1"], ["opus_t1", "R2"]],
+  "rules": "as the pre-set decision rules: scaling the teacher labels further (to 749 chapters) is indicated when R1 - A2 or R2 - A3 reaches +0.02 micro F1 with both intervals above 0 and non-person F1 and new-name recall not worse; a miss is reported with the point, both intervals and their width, never as invalid; R2 - R1 says whether starting from S3 still helps at 300 chapters; the teacher gap (opus_t1 - R) says whether adding the same teacher labels can still pay"
+ },
+ "exclusion_qa": {
+  "what": "an independent quality check of the exclusions in the dev2 and test2 answers: every place ruled not-a-name (none) or unscored by the annotator, the name sheet or the reviewer (configs/gold_dev2_v1_decisions.json, configs/gold_test2_v1_decisions.json)",
+  "checker": "gpt-6.1-sol through the API (novel_ner.gpt_api; the drafter of the passes, which never saw the rulings; not GPT-6-Astra, which made most of them), one fresh request per package",
+  "inputs": "guide v1.1, the QA instructions (docs/llm_annotation/qa_exclusions_v1.md), the chapter text, and for each excluded place its text, position, the ruling and the annotator words about the name; NO system prediction, score, or comparison result is given",
+  "outputs": "per place: agrees / disagrees (with the rule it cites and the reading it would give) / cannot tell; a report for the annotator under data/gold/<set>/review_qa/; runs/<run id>/metrics.json counts only",
+  "effect": "none by itself: an answer changes only if the annotator decides, as a new answers version (old versions untouched); the QA rulings never enter any training label (teacher labels come from Opus on training chapters only) and are not seen by any system under test; test2 stays sealed (answer-making exemption, like the drafting passes and the adjudication)",
+  "budget": "about 90 places in about 20 chapters; one request per set-and-chapter-batch, estimated under 3 USD of the GPT cap (15.9 USD left)"
+ }
+}

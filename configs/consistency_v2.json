@@ -1,0 +1,25 @@
+{
+ "description": "Round 4, the closing control of the label rules: everything of configs/consistency_v1.json kept, K5_pending_majority alone removed, to test whether the new-name recall drop of round 3 (R2c - R2 -0.031, both intervals below 0) is tied to K5 (which turned 389 positives of the 300-chapter build and 49 of the 100-chapter build into uncertain regions). No gain is promised or expected on any particular name; the comparison reads overall F1, precision, non-person F1 and new-name recall on dev2 against the untouched labels (A3, R2) and against round 3 (A3c, R2c). Same source builds, same training recipes and seeds as rounds 1-3; only the labels differ. Thresholds of K6/K7/K8 unchanged.",
+ "snapshot": "to0990-79dc77f8d354",
+ "builds": [
+  {"source": "20261004-teacher100", "target": "20261004-teacher100d"},
+  {"source": "20261004-teacher300", "target": "20261004-teacher300d"}
+ ],
+ "rules_in_order": ["K7_boundary", "K6_type_conflict", "K8_same_chapter_partial"],
+ "rules_not_applied": ["K5_pending_majority"],
+ "K7_boundary": {"rule": "as configs/consistency_v1.json K7_boundary", "min_len_shorter": 1},
+ "K6_type_conflict": {"rule": "as configs/consistency_v1.json K6_type_conflict", "minority_share": 0.2},
+ "K8_same_chapter_partial": {"rule": "as configs/consistency_v1.json K8_same_chapter_partial", "min_len": 2},
+ "records": "as configs/consistency_v1.json; the record names the rule left out",
+ "training_plan": {
+  "A3d": {"config": "configs/train_s4_ft100d.json", "setting": "T", "what": "as A3 (base from the S3 checkpoints, 100 teacher chapters) on labels 20261004-teacher100d (K7, K6, K8; no K5)"},
+  "R2d": {"config": "configs/train_s4_ft300d.json", "setting": "T", "what": "as R2 (base from the S3 checkpoints, 300 teacher chapters) on labels 20261004-teacher300d (K7, K6, K8; no K5)"},
+  "seeds": [1, 2, 3]
+ },
+ "comparison": {
+  "decision_set": "dev2 (data/gold/dev2/20261004-130201_guide-v1.1.json); test2 stays sealed",
+  "metrics": ["micro F1", "micro precision", "non-person F1", "new-name recall"],
+  "pairs": [["A3d", "A3"], ["A3d", "A3c"], ["R2d", "R2"], ["R2d", "R2c"], ["opus_t1", "A3d"]],
+  "rules": "what this round validates: if R2d - R2c (and A3d - A3c) recovers the new-name recall that round 3 lost while R2d - R2 stays at or above 0 on precision, the recall drop was tied to K5; if R2d still loses new-name recall, the drop is not K5's alone. Read with both interval kinds; report points, intervals and widths; no verdict words beyond that. After this round the label rules are closed and the work moves to training recipes and backbones on the original teacher labels with A3 as the baseline."
+ }
+}

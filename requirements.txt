@@ -1,0 +1,11 @@
+# Research environment: .venv created with --system-site-packages (torch 2.11+cu128 comes from the base Python)
+gliner==0.2.29
+transformers==5.16.1
+sentencepiece==0.2.2
+# needed to rebuild mDeBERTa's tokenizer from spm.model (else full-width punctuation becomes [UNK])
+protobuf==7.36.2
+# Chinese word segmentation, one of the word splitters tried with GLiNER
+jieba==0.42.1
+pytest==9.1.1
+# GPT annotation passes through the OpenAI API
+openai==3.23.0

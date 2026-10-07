@@ -1,0 +1,26 @@
+{
+ "description": "Round 3: make the Opus teacher labels consistent with themselves and the guide using only the training chapters' text and the teacher's own output; no answer file, name sheet, dev2/test/test2 or system output is read. Applied to the 100-chapter build 20261004-teacher100 (-> 20261004-teacher100c) and the 300-chapter build 20261004-teacher300 (-> 20261004-teacher300c); the W (weak) rows are copied unchanged. Thresholds fixed here before any run; nothing is tuned on dev2. Audit that motivated the rules (300 chapters, 2026-10-04, training text only): 28 strings with two or more types (647 spans), 21 spans sitting inside a longer labelled name of the same type at that position, 44 unlabelled occurrences of strings the teacher labelled in the same chapter, and strings the teacher marked pending in about half of their occurrences (one was labelled organization 11 times and pending 10 times).",
+ "snapshot": "to0990-79dc77f8d354",
+ "builds": [
+  {"source": "20261004-teacher100", "target": "20261004-teacher100c"},
+  {"source": "20261004-teacher300", "target": "20261004-teacher300c"}
+ ],
+ "rules_in_order": ["K7_boundary", "K6_type_conflict", "K5_pending_majority", "K8_same_chapter_partial"],
+ "K7_boundary": {"rule": "guide B2 (flat, full name): a positive span whose text is a strict substring of another string the teacher labelled as a positive of the same type somewhere in the build, when that longer string occurs in the chapter text exactly at a position covering the span, is extended to the longer string. The longest such longer string is taken; ties by the earlier start. If the extended span would overlap another label or uncertain region, the union of them becomes one uncertain region whose types are all types involved (reason K7_overlap). Counts per (shorter, longer) pair are recorded; the strings go to data/analysis.", "min_len_shorter": 1},
+ "K6_type_conflict": {"rule": "a string labelled with two or more types across the build: every type whose share of the string's positive occurrences is at most minority_share becomes uncertain at its occurrences, with types = all types the teacher gave the string (guide C1 allows a different type per occurrence, so a substantial split is kept as labelled; only a small minority is treated as an inconsistency).", "minority_share": 0.2},
+ "K5_pending_majority": {"rule": "a string the teacher marked pending in at least pending_share of its occurrences (positive plus pending occurrences across the build) and at least min_pending times: every positive occurrence of the string becomes uncertain with types = the types the teacher gave it (the teacher's own doubt is carried to all its occurrences rather than half confident, half pending).", "pending_share": 0.3333, "min_pending": 2},
+ "K8_same_chapter_partial": {"rule": "an occurrence of a string (at least min_len characters) that the teacher labelled positive elsewhere in the same chapter, when the occurrence overlaps no label and no uncertain region, becomes an uncertain region with types = the types the string has in that chapter (an unlabelled occurrence of a name the teacher recognised in the chapter is not treated as a sure O).", "min_len": 2},
+ "records": "the target build has the same record shape as its source (tagger.train, evaluate and posthoc checks), plus derived_from {source build, labels sha256}, the rules with their counts per rule and per type, spans before and after by type, uncertain regions by reason; keys.json under data/analysis holds the strings; metrics.json numbers only",
+ "training_plan": {
+  "A3c": {"config": "configs/train_s3_ft100c.json", "setting": "T", "what": "as A3 (base from the S3 checkpoints, 100 teacher chapters) on the consistent labels 20261004-teacher100c"},
+  "R2c": {"config": "configs/train_s3_ft300c.json", "setting": "T", "what": "as R2 (base from the S3 checkpoints, 300 teacher chapters) on the consistent labels 20261004-teacher300c"},
+  "seeds": [1, 2, 3],
+  "same_chapter_controls": "A3c vs A3 (same 100 chapters, same recipe train_s1_base_a3.json, same seeds); R2c vs R2 (same 300 chapters, same recipe train_s2_base_ft.json, same seeds); only the labels differ"
+ },
+ "comparison": {
+  "decision_set": "dev2 (data/gold/dev2/20261004-130201_guide-v1.1.json); test2 stays sealed",
+  "metrics": ["micro F1", "micro precision", "non-person F1", "new-name recall"],
+  "pairs": [["A3c", "A3"], ["R2c", "R2"], ["R2c", "A3"], ["A3c", "A2"], ["opus_t1", "A3c"], ["opus_t1", "R2c"]],
+  "rules": "what this round validates: whether the teacher labels' internal inconsistencies (not any answer knowledge) explain part of the gap to the teacher and the precision drop of the 300-chapter models. Read A3c - A3 and R2c - R2 on all four metrics with both interval kinds; a change of at least +0.01 micro F1 with both intervals above 0 counts as established; anything else is reported with point, intervals and width. If neither pair moves, the label route is not enough by itself and training settings or another backbone come next."
+ }
+}

@@ -1,0 +1,45 @@
+{
+ "description": "Round 5 candidate lr2e5 (configs/recipes_v1.json): exactly train_s1_base_a3.json (A3) with the stage 2 learning rate 2e-05 instead of 3e-5; checkpoints (the frozen S3 runs of the same seed), labels (the ORIGINAL teacher labels, build 20261004-teacher100 setting T), schedule, batch, eval cadence, patience and seeds as A3. One point of the learning-rate grid 2e-5 / 3e-5 (= A3) / 5e-5 that every round 6 backbone also gets. Trainer: python -m novel_ner.tagger train. Nothing tuned on dev2 or the test. --- A3: Stage 1 arm A3: the base backbone first trained on the 749 training chapters' weak S3 labels (the existing, frozen S3 checkpoints runs/20261003-tag-S3-s<seed>-dev31, one per seed) and then fine-tuned on the 100 teacher chapters' Opus labels (setting T of weak build 20261004-teacher100), NEEDLE's two-stage recipe. init_from_run names the checkpoint to start from; '{seed}' is replaced by the run's seed, so seed 1 starts from the S3 seed-1 run, seed 2 from seed 2, and so on (the pairing is recorded in config.json as init_from, with that run's config.json sha256). The run refuses a checkpoint from another backbone id. Everything else (schedule, lr, batch, sufficiency record, checkpoint rule) is train_s1_base: about 1300 planned steps, dev every 2 epochs, patience 6; the sufficiency record shows whether fine-tuning from a trained model needed fewer steps. Intended setting: T only (A3 compares with A2 = T from the fresh backbone: does the weak pre-training still help once teacher labels exist?); W from an S3 checkpoint would re-train on the same label source and is not an arm. Three seeds. Nothing tuned on dev2 or the test.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261004-teacher100",
+ "settings_intended": [
+  "T"
+ ],
+ "arms": {
+  "T": "lr2e5 (A3 at stage 2 learning rate 2e-05)"
+ },
+ "init_from_run": "runs/20261003-tag-S3-s{seed}-dev31",
+ "init_from_run_note": "'{seed}' is filled with --seed; the named run must be finished (metrics.json, checkpoints/best) and use the same backbone id",
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 2e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "grad_accumulation": 1,
+ "max_epochs": 40,
+ "eval_every": 2.0,
+ "patience": 6,
+ "planned_steps_note": "as train_s1_base: about 32 steps per epoch x 40 epochs = about 1300 steps",
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

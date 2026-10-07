@@ -1,0 +1,35 @@
+{
+ "description": "Character-level BIO tagger trained on weak labels: hfl/chinese-roberta-wwm-ext plus one linear layer over 13 labels (O, B-/I- of six types), partial-label loss (a one-label set is ordinary cross-entropy; an all-13 set is left out). The setting (S1/S2/S3) picks the weak build's label file; only its 'train' chapters (1-780 minus the 31 dev chapters) are used, and the weak build's record (runs/<weak_build>/config.json) must match the label file's sha256, the snapshot and the training chapters. Dev (the answered dev chapters in gold_dev) picks the checkpoint inside a run (best strict micro F1, ties: earlier) and, across runs, the setting. Hyperparameters are the common defaults from the backbone survey, fixed before any run, not tuned on dev. AdamW applies weight_decay to weight matrices only (not biases or LayerNorm). quote_map: six characters the HFL vocabulary lacks, replaced one for one before tokenizing so offsets do not move. deterministic: torch deterministic algorithms in strict mode (an op without a deterministic version stops the run), so the same seed repeats exactly. v2 (2026-10-03): weak build 20261003-weak_v2 (adds S1b) and dev answers v2 (31 chapters, 1580 scored spans); hyperparameters unchanged from v1 and never tuned. Selection rule, written before any v2 run: each setting is trained with seeds 1, 2, 3; inside a run the checkpoint is the one with the best dev micro F1 (ties: the earlier step); the setting with the highest mean dev micro F1 over its seeds is the main weak-supervision system (main table, learning curve). Every setting is then run on the test chapters once, after the settings are frozen, for the ablation table; nothing is chosen on the test set.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261003-weak_v2",
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 3e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "max_epochs": 6,
+ "eval_every": 0.5,
+ "patience": 3,
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

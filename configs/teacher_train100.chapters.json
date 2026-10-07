@@ -1,0 +1,783 @@
+{
+ "config": "teacher_train100.json",
+ "snapshot": "to0990-79dc77f8d354",
+ "seed": 20261004,
+ "code_commit": "50bed1813e33fbf340f77bc98f4434cb8db0f7d4",
+ "pool": {
+  "chapters": 749,
+  "numbers": [
+   1,
+   780
+  ],
+  "max_train_chapter": 780,
+  "dev_chapters_excluded": 31,
+  "rule": "chapters 1..max_train_chapter of the snapshot minus the dev config's chapters, sorted by number, cut into equal-count ranges; novel_ner.sample_test.stratified_order spreads the strata evenly"
+ },
+ "strata": {
+  "s01": {
+   "chapters": 93,
+   "numbers": [
+    1,
+    99
+   ],
+   "sampled": 12
+  },
+  "s02": {
+   "chapters": 94,
+   "numbers": [
+    100,
+    194
+   ],
+   "sampled": 13
+  },
+  "s03": {
+   "chapters": 93,
+   "numbers": [
+    195,
+    288
+   ],
+   "sampled": 12
+  },
+  "s04": {
+   "chapters": 94,
+   "numbers": [
+    289,
+    385
+   ],
+   "sampled": 13
+  },
+  "s05": {
+   "chapters": 94,
+   "numbers": [
+    386,
+    483
+   ],
+   "sampled": 12
+  },
+  "s06": {
+   "chapters": 93,
+   "numbers": [
+    484,
+    580
+   ],
+   "sampled": 12
+  },
+  "s07": {
+   "chapters": 94,
+   "numbers": [
+    581,
+    680
+   ],
+   "sampled": 13
+  },
+  "s08": {
+   "chapters": 94,
+   "numbers": [
+    681,
+    780
+   ],
+   "sampled": 13
+  }
+ },
+ "n": 100,
+ "batch_size": 5,
+ "order": [
+  {
+   "chapter_id": "ch0345",
+   "number": 345,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0151",
+   "number": 151,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0676",
+   "number": 676,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0031",
+   "number": 31,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0715",
+   "number": 715,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0268",
+   "number": 268,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0533",
+   "number": 533,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0469",
+   "number": 469,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0347",
+   "number": 347,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0103",
+   "number": 103,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0671",
+   "number": 671,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0070",
+   "number": 70,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0697",
+   "number": 697,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0275",
+   "number": 275,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0527",
+   "number": 527,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0404",
+   "number": 404,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0298",
+   "number": 298,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0124",
+   "number": 124,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0675",
+   "number": 675,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0066",
+   "number": 66,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0759",
+   "number": 759,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0195",
+   "number": 195,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0506",
+   "number": 506,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0410",
+   "number": 410,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0335",
+   "number": 335,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0120",
+   "number": 120,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0670",
+   "number": 670,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0003",
+   "number": 3,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0731",
+   "number": 731,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0216",
+   "number": 216,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0519",
+   "number": 519,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0421",
+   "number": 421,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0293",
+   "number": 293,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0114",
+   "number": 114,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0581",
+   "number": 581,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0062",
+   "number": 62,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0729",
+   "number": 729,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0251",
+   "number": 251,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0574",
+   "number": 574,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0450",
+   "number": 450,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0368",
+   "number": 368,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0149",
+   "number": 149,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0622",
+   "number": 622,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0088",
+   "number": 88,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0752",
+   "number": 752,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0261",
+   "number": 261,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0495",
+   "number": 495,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0413",
+   "number": 413,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0353",
+   "number": 353,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0134",
+   "number": 134,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0636",
+   "number": 636,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0085",
+   "number": 85,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0742",
+   "number": 742,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0242",
+   "number": 242,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0576",
+   "number": 576,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0447",
+   "number": 447,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0358",
+   "number": 358,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0172",
+   "number": 172,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0582",
+   "number": 582,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0005",
+   "number": 5,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0703",
+   "number": 703,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0266",
+   "number": 266,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0548",
+   "number": 548,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0451",
+   "number": 451,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0379",
+   "number": 379,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0102",
+   "number": 102,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0584",
+   "number": 584,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0719",
+   "number": 719,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0052",
+   "number": 52,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0210",
+   "number": 210,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0559",
+   "number": 559,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0432",
+   "number": 432,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0300",
+   "number": 300,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0136",
+   "number": 136,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0614",
+   "number": 614,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0709",
+   "number": 709,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0039",
+   "number": 39,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0248",
+   "number": 248,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0565",
+   "number": 565,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0428",
+   "number": 428,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0380",
+   "number": 380,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0173",
+   "number": 173,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0617",
+   "number": 617,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0684",
+   "number": 684,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0083",
+   "number": 83,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0231",
+   "number": 231,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0517",
+   "number": 517,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0444",
+   "number": 444,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0384",
+   "number": 384,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0148",
+   "number": 148,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0594",
+   "number": 594,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0718",
+   "number": 718,
+   "stratum": "s08"
+  },
+  {
+   "chapter_id": "ch0016",
+   "number": 16,
+   "stratum": "s01"
+  },
+  {
+   "chapter_id": "ch0264",
+   "number": 264,
+   "stratum": "s03"
+  },
+  {
+   "chapter_id": "ch0546",
+   "number": 546,
+   "stratum": "s06"
+  },
+  {
+   "chapter_id": "ch0465",
+   "number": 465,
+   "stratum": "s05"
+  },
+  {
+   "chapter_id": "ch0327",
+   "number": 327,
+   "stratum": "s04"
+  },
+  {
+   "chapter_id": "ch0193",
+   "number": 193,
+   "stratum": "s02"
+  },
+  {
+   "chapter_id": "ch0649",
+   "number": 649,
+   "stratum": "s07"
+  },
+  {
+   "chapter_id": "ch0743",
+   "number": 743,
+   "stratum": "s08"
+  }
+ ],
+ "training_packs": [
+  "teach_b01",
+  "teach_b02",
+  "teach_b03",
+  "teach_b04",
+  "teach_b05",
+  "teach_b06",
+  "teach_b07",
+  "teach_b08",
+  "teach_b09",
+  "teach_b10",
+  "teach_b11",
+  "teach_b12",
+  "teach_b13",
+  "teach_b14",
+  "teach_b15",
+  "teach_b16",
+  "teach_b17",
+  "teach_b18",
+  "teach_b19",
+  "teach_b20"
+ ],
+ "dev_pack": "teach_dev_b01",
+ "packs": {
+  "teach_b01": [
+   "ch0345",
+   "ch0151",
+   "ch0676",
+   "ch0031",
+   "ch0715"
+  ],
+  "teach_b02": [
+   "ch0268",
+   "ch0533",
+   "ch0469",
+   "ch0347",
+   "ch0103"
+  ],
+  "teach_b03": [
+   "ch0671",
+   "ch0070",
+   "ch0697",
+   "ch0275",
+   "ch0527"
+  ],
+  "teach_b04": [
+   "ch0404",
+   "ch0298",
+   "ch0124",
+   "ch0675",
+   "ch0066"
+  ],
+  "teach_b05": [
+   "ch0759",
+   "ch0195",
+   "ch0506",
+   "ch0410",
+   "ch0335"
+  ],
+  "teach_b06": [
+   "ch0120",
+   "ch0670",
+   "ch0003",
+   "ch0731",
+   "ch0216"
+  ],
+  "teach_b07": [
+   "ch0519",
+   "ch0421",
+   "ch0293",
+   "ch0114",
+   "ch0581"
+  ],
+  "teach_b08": [
+   "ch0062",
+   "ch0729",
+   "ch0251",
+   "ch0574",
+   "ch0450"
+  ],
+  "teach_b09": [
+   "ch0368",
+   "ch0149",
+   "ch0622",
+   "ch0088",
+   "ch0752"
+  ],
+  "teach_b10": [
+   "ch0261",
+   "ch0495",
+   "ch0413",
+   "ch0353",
+   "ch0134"
+  ],
+  "teach_b11": [
+   "ch0636",
+   "ch0085",
+   "ch0742",
+   "ch0242",
+   "ch0576"
+  ],
+  "teach_b12": [
+   "ch0447",
+   "ch0358",
+   "ch0172",
+   "ch0582",
+   "ch0005"
+  ],
+  "teach_b13": [
+   "ch0703",
+   "ch0266",
+   "ch0548",
+   "ch0451",
+   "ch0379"
+  ],
+  "teach_b14": [
+   "ch0102",
+   "ch0584",
+   "ch0719",
+   "ch0052",
+   "ch0210"
+  ],
+  "teach_b15": [
+   "ch0559",
+   "ch0432",
+   "ch0300",
+   "ch0136",
+   "ch0614"
+  ],
+  "teach_b16": [
+   "ch0709",
+   "ch0039",
+   "ch0248",
+   "ch0565",
+   "ch0428"
+  ],
+  "teach_b17": [
+   "ch0380",
+   "ch0173",
+   "ch0617",
+   "ch0684",
+   "ch0083"
+  ],
+  "teach_b18": [
+   "ch0231",
+   "ch0517",
+   "ch0444",
+   "ch0384",
+   "ch0148"
+  ],
+  "teach_b19": [
+   "ch0594",
+   "ch0718",
+   "ch0016",
+   "ch0264",
+   "ch0546"
+  ],
+  "teach_b20": [
+   "ch0465",
+   "ch0327",
+   "ch0193",
+   "ch0649",
+   "ch0743"
+  ],
+  "teach_dev_b01": [
+   "ch0033",
+   "ch0097",
+   "ch0324",
+   "ch0437",
+   "ch0668"
+  ]
+ },
+ "pilot": [
+  "teach_b01",
+  "teach_b02",
+  "teach_dev_b01"
+ ],
+ "dev_pilot": {
+  "n": 5,
+  "seed": 20261004,
+  "chapters": [
+   "ch0033",
+   "ch0097",
+   "ch0324",
+   "ch0437",
+   "ch0668"
+  ],
+  "numbers": [
+   33,
+   97,
+   324,
+   437,
+   668
+  ],
+  "source": "configs/annotate_dev.json (31 dev chapters; that they have answers is checked by `check`, which is the only command that opens the answers)"
+ },
+ "created_at": "2026-10-04T02:34:58-0700"
+}

@@ -1,0 +1,45 @@
+{
+ "description": "Stage 2 route R1 and control C (configs/teacher_train300.json training_plan): the base backbone hfl/chinese-roberta-wwm-ext trained directly on the 300 teacher chapters of weak build 20261004-teacher300 (setting T = Opus teacher labels, R1; setting W = the weak S3 labels of the same chapters, C). Schedule set for 300 chapters before any run: max_epochs 20 (about 1880 planned steps), dev (31 answered dev chapters) scored every epoch, patience 6, lr 3e-5, batch 16, grad_accumulation 1; the checkpoint rule is unchanged (best dev micro F1, ties earlier) and metrics.json records sufficiency; a flagged run is re-run under a longer schedule and both are recorded. Nothing is tuned on dev2 or the tests. Compared on dev2 by the pairs and rules in configs/teacher_train300.json.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261004-teacher300",
+ "settings_intended": [
+  "T",
+  "W"
+ ],
+ "arms": {
+  "T": "R1 (teacher labels of the 300 chapters, base trained directly)",
+  "W": "C (weak S3 labels of the same 300 chapters, control)"
+ },
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 3e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "grad_accumulation": 1,
+ "max_epochs": 20,
+ "eval_every": 1.0,
+ "patience": 6,
+ "planned_steps_note": "about 1500 windows / 16 = about 94 steps per epoch x 20 epochs = about 1880 planned steps (S3 on 749 chapters planned 1410); dev scored every epoch, patience 6",
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

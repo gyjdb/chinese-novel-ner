@@ -1,0 +1,40 @@
+{
+ "description": "Stage 1 arm B0: the full-data backbone comparison. The large backbone hfl/chinese-roberta-wwm-ext-large trained on all 749 training chapters' weak S3 labels (weak build 20261003-weak_v2, setting S3, the same label file and training chapters as the existing base runs runs/20261003-tag-S3-s{1,2,3}-dev31), so B0 - S3 is the effect of swapping the backbone (base -> large, the whole swap, not the parameter count alone) on the data the project already has. To keep the comparison clean the schedule is S3's own: max_epochs 6, dev every half epoch, patience 3, batch 16 (235 steps per epoch, 1410 planned; S3's three seeds stopped by patience after about 3 epochs); only lr changes to 2e-5 (the usual large-model rate) and batch 16 is reached as 2 micro-batches of 8 (grad_accumulation 2; token-weighted, so the loss, gradient and schedule equal a whole batch's; the orchestrator may set it to 1 after measuring memory). The sufficiency record in metrics.json says whether this schedule was enough for large; if not, the run is repeated with more epochs and both are reported. Expected cost on the RTX 5080: about 5-10 minutes per seed (base took 1-2 minutes). Three seeds. Nothing tuned on dev2 or the test.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261003-weak_v2",
+ "settings_intended": ["S3"],
+ "arms": {"S3": "B0 (weak S3 labels, 749 chapters, large; compare with runs/20261003-tag-S3-s*-dev31)"},
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext-large",
+  "revision": "a25cc9e05974bd9687e528edd516f2cfdb3f5db9",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 1,306,484,351 bytes plus small tokenizer files (about 1.31 GB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 2e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "grad_accumulation": 2,
+ "grad_accumulation_note": "micro-batch 8; set to 1 if the orchestrator's memory test shows a batch of 16 fits (same loss and schedule either way)",
+ "max_epochs": 6,
+ "eval_every": 0.5,
+ "patience": 3,
+ "planned_steps_note": "749 chapters = 3751 windows / 16 = 235 steps per epoch x 6 = 1410 planned, S3's schedule",
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

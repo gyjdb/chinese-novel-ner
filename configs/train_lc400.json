@@ -1,0 +1,35 @@
+{
+ "description": "Learning-curve tier N = 400: the character-level BIO tagger of configs/train_v2.json with the same backbone, hyperparameters, epochs, evaluation schedule, patience and checkpoint rule (none tuned, none changed per tier), trained on setting S3 of weak build 20261003-weak_lc400 (training chapters 1-400 minus the dev chapters; the dictionary and the Opus lists truncated at 400 as that build's record states: a dictionary row without a reveal chapter is dated by the first chapter up to 780 whose Opus list names it and dropped when that is after 400; strict except the stated residual of such rows that no list up to 780 names, which are dated only by a substring test on the training texts). The setting is fixed to S3 by the train_v2 selection rule (highest mean dev micro F1 over seeds 1-3), decided before any tier was trained; seeds 1, 2, 3. Inside a run the checkpoint is the one with the best strict micro F1 on dev answers v2 (the 31 answered dev chapters, which reach chapter 777; ties: the earlier step): a stated deviation from a pure cold start, since a new book would have no answered chapters after 400. max_epochs stays 6 as in train_v2, so a small tier takes few optimizer steps; nothing compensates for the smaller data. Label versions: this tier trains only on extract_v1 lists. Nothing about a tier is chosen on the test set.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261003-weak_lc400",
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 3e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "max_epochs": 6,
+ "eval_every": 0.5,
+ "patience": 3,
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

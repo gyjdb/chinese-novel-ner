@@ -1,0 +1,44 @@
+{
+ "description": "Round 3 arm R2c: exactly train_s2_base_ft.json (R2) with the weak build replaced by 20261004-teacher300c, the consistency-rule version of the same 300 chapters of teacher labels (configs/consistency_v1.json). Same recipe, same seeds: only the labels differ. Stage 2 route R2 (configs/teacher_train300.json training_plan): as train_s2_base.json but the model starts from the S3 checkpoint of the same seed (init_from_run runs/20261003-tag-S3-s{seed}-dev31, the 749-chapter weak-label run, as stage 1 arm A3 did) and is fine-tuned on the 300 teacher chapters (setting T). Same schedule and rules as train_s2_base.json.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261004-teacher300c",
+ "settings_intended": [
+  "T"
+ ],
+ "arms": {
+  "T": "R2c (consistent teacher labels of the 300 chapters, from the S3 checkpoints)"
+ },
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 3e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "grad_accumulation": 1,
+ "max_epochs": 20,
+ "eval_every": 1.0,
+ "patience": 6,
+ "planned_steps_note": "about 1500 windows / 16 = about 94 steps per epoch x 20 epochs = about 1880 planned steps (S3 on 749 chapters planned 1410); dev scored every epoch, patience 6",
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ },
+ "init_from_run": "runs/20261003-tag-S3-s{seed}-dev31"
+}

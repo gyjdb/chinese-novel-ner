@@ -1,0 +1,347 @@
+{
+ "description": "Sealed test set (40 chapters, 1,790 scored mentions), scored once after the method was frozen. Strict matching: chapter, start, end and type must all match. Trained systems: mean over 3 seeds; LLM systems: one run each. Numbers only; the answer key and predictions are not public.",
+ "systems": {
+  "A3": {
+   "precision": 0.923,
+   "recall": 0.892,
+   "f1": 0.908,
+   "non_person_f1": 0.807,
+   "new_name_recall": 0.851,
+   "runs": 3,
+   "what": "two-stage: weak labels (749 chapters) -> teacher labels (100 chapters)"
+  },
+  "A2": {
+   "precision": 0.893,
+   "recall": 0.883,
+   "f1": 0.888,
+   "non_person_f1": 0.755,
+   "new_name_recall": 0.842,
+   "runs": 3,
+   "what": "teacher labels only (100 chapters)"
+  },
+  "S3": {
+   "precision": 0.908,
+   "recall": 0.886,
+   "f1": 0.897,
+   "non_person_f1": 0.77,
+   "new_name_recall": 0.821,
+   "runs": 3,
+   "what": "weak labels only (749 chapters)"
+  },
+  "Opus": {
+   "precision": 0.978,
+   "recall": 0.909,
+   "f1": 0.942,
+   "non_person_f1": 0.88,
+   "new_name_recall": 0.884,
+   "runs": 1,
+   "what": "Claude Opus, full guideline, may abstain"
+  },
+  "Sonnet": {
+   "precision": 0.975,
+   "recall": 0.908,
+   "f1": 0.94,
+   "non_person_f1": 0.892,
+   "new_name_recall": 0.887,
+   "runs": 1,
+   "what": "Claude Sonnet, full guideline, may abstain"
+  },
+  "GLiNER": {
+   "precision": 0.594,
+   "recall": 0.62,
+   "f1": 0.606,
+   "non_person_f1": 0.304,
+   "new_name_recall": 0.455,
+   "runs": 1,
+   "what": "GLiNER multi v2.1, zero-shot"
+  },
+  "Dictionary": {
+   "precision": 0.959,
+   "recall": 0.354,
+   "f1": 0.517,
+   "non_person_f1": 0.23,
+   "new_name_recall": 0.0,
+   "runs": 1,
+   "what": "dictionary match (training-snapshot dictionary)"
+  }
+ },
+ "paired_differences": {
+  "A3 - A2": {
+   "micro_f1": {
+    "point": 0.0196,
+    "ci95_chapters": [
+     0.0089,
+     0.0323
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0075,
+     0.0338
+    ]
+   },
+   "micro_precision": {
+    "point": 0.0303,
+    "ci95_chapters": [
+     0.0145,
+     0.0482
+    ],
+    "ci95_chapters_and_seeds": [
+     0.011,
+     0.0515
+    ]
+   },
+   "non_person_f1": {
+    "point": 0.0521,
+    "ci95_chapters": [
+     0.0215,
+     0.0907
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0171,
+     0.0956
+    ]
+   },
+   "new_name_recall": {
+    "point": 0.0085,
+    "ci95_chapters": [
+     -0.0014,
+     0.0199
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0039,
+     0.0223
+    ]
+   }
+  },
+  "Opus - A3": {
+   "micro_f1": {
+    "point": 0.0349,
+    "ci95_chapters": [
+     0.0241,
+     0.0472
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0234,
+     0.0483
+    ]
+   },
+   "micro_precision": {
+    "point": 0.0552,
+    "ci95_chapters": [
+     0.0422,
+     0.0694
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0402,
+     0.0722
+    ]
+   },
+   "non_person_f1": {
+    "point": 0.0733,
+    "ci95_chapters": [
+     0.0415,
+     0.1092
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0391,
+     0.1128
+    ]
+   },
+   "new_name_recall": {
+    "point": 0.0333,
+    "ci95_chapters": [
+     0.0097,
+     0.0598
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0092,
+     0.06
+    ]
+   }
+  },
+  "Sonnet - A3": {
+   "micro_f1": {
+    "point": 0.0326,
+    "ci95_chapters": [
+     0.0209,
+     0.0447
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0204,
+     0.046
+    ]
+   },
+   "micro_precision": {
+    "point": 0.0517,
+    "ci95_chapters": [
+     0.0385,
+     0.0663
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0365,
+     0.0691
+    ]
+   },
+   "non_person_f1": {
+    "point": 0.0856,
+    "ci95_chapters": [
+     0.0486,
+     0.1251
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0455,
+     0.1275
+    ]
+   },
+   "new_name_recall": {
+    "point": 0.0363,
+    "ci95_chapters": [
+     0.0103,
+     0.0635
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0104,
+     0.0643
+    ]
+   }
+  },
+  "Opus - Sonnet": {
+   "micro_f1": {
+    "point": 0.0022,
+    "ci95_chapters": [
+     -0.0071,
+     0.0127
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0071,
+     0.0127
+    ]
+   },
+   "micro_precision": {
+    "point": 0.0035,
+    "ci95_chapters": [
+     0.0009,
+     0.0068
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0009,
+     0.0068
+    ]
+   },
+   "non_person_f1": {
+    "point": -0.0123,
+    "ci95_chapters": [
+     -0.0373,
+     0.0142
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0373,
+     0.0142
+    ]
+   },
+   "new_name_recall": {
+    "point": -0.0031,
+    "ci95_chapters": [
+     -0.0321,
+     0.029
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0321,
+     0.029
+    ]
+   }
+  },
+  "A3 - S3": {
+   "micro_f1": {
+    "point": 0.0103,
+    "ci95_chapters": [
+     -0.0028,
+     0.0243
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0066,
+     0.0285
+    ]
+   },
+   "micro_precision": {
+    "point": 0.0149,
+    "ci95_chapters": [
+     -0.004,
+     0.0349
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0112,
+     0.0418
+    ]
+   },
+   "non_person_f1": {
+    "point": 0.0369,
+    "ci95_chapters": [
+     -0.0003,
+     0.075
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0088,
+     0.0844
+    ]
+   },
+   "new_name_recall": {
+    "point": 0.0299,
+    "ci95_chapters": [
+     0.0128,
+     0.0517
+    ],
+    "ci95_chapters_and_seeds": [
+     0.011,
+     0.0532
+    ]
+   }
+  },
+  "A2 - S3": {
+   "micro_f1": {
+    "point": -0.0093,
+    "ci95_chapters": [
+     -0.0248,
+     0.007
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0287,
+     0.0097
+    ]
+   },
+   "micro_precision": {
+    "point": -0.0154,
+    "ci95_chapters": [
+     -0.0388,
+     0.0089
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0448,
+     0.0136
+    ]
+   },
+   "non_person_f1": {
+    "point": -0.0152,
+    "ci95_chapters": [
+     -0.0567,
+     0.0326
+    ],
+    "ci95_chapters_and_seeds": [
+     -0.0667,
+     0.0366
+    ]
+   },
+   "new_name_recall": {
+    "point": 0.0214,
+    "ci95_chapters": [
+     0.0025,
+     0.0464
+    ],
+    "ci95_chapters_and_seeds": [
+     0.0,
+     0.0476
+    ]
+   }
+  }
+ },
+ "interval_note": "95% paired bootstrap, 10,000 rounds, chapters resampled within six chapter-range strata; the second interval also resamples the training seed. Points are from counts pooled over seeds."
+}

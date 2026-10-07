@@ -1,0 +1,33 @@
+{
+ "description": "Zero-shot GLiNER trial: how to feed Chinese (word splitter, space marks, tokenizer fix) and which label language; compared with the LLM extraction, not gold. The sampled chapters are development chapters: keep them out of the gold set.",
+ "snapshot": "to0990-79dc77f8d354",
+ "sample": {
+  "seed": 20260930,
+  "n": 30,
+  "max_chapter": 780,
+  "exclude_numbers": [225, 229, 238],
+  "reference_model_prefix": "claude-opus"
+ },
+ "chunk_max_chars": 200,
+ "batch_size": 16,
+ "save_threshold": 0.1,
+ "report_thresholds": [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.93, 0.95],
+ "labels": {
+  "en": {"person": "person", "organization": "organization", "location": "location",
+         "dungeon": "dungeon", "item": "item", "trait": "trait"},
+  "zh": {"person": "人物", "organization": "组织", "location": "地点",
+         "dungeon": "副本", "item": "道具", "trait": "特性"}
+ },
+ "variants": [
+  {"name": "whitespace-perword-en", "splitter": "whitespace", "space_mode": "per_word", "labels": "en"},
+  {"name": "char-perword-en-nofix", "splitter": "char", "space_mode": "per_word", "labels": "en", "fix_normalizer": false},
+  {"name": "char-perword-en", "splitter": "char", "space_mode": "per_word", "labels": "en"},
+  {"name": "char-perword-zh", "splitter": "char", "space_mode": "per_word", "labels": "zh"},
+  {"name": "char-natural-en", "splitter": "char", "space_mode": "natural", "labels": "en"},
+  {"name": "char-natural-zh", "splitter": "char", "space_mode": "natural", "labels": "zh"},
+  {"name": "jieba-perword-en", "splitter": "jieba", "space_mode": "per_word", "labels": "en"},
+  {"name": "jieba-perword-zh", "splitter": "jieba", "space_mode": "per_word", "labels": "zh"},
+  {"name": "jieba-natural-en", "splitter": "jieba", "space_mode": "natural", "labels": "en"},
+  {"name": "jieba-natural-zh", "splitter": "jieba", "space_mode": "natural", "labels": "zh"}
+ ]
+}

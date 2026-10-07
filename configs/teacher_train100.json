@@ -1,0 +1,40 @@
+{
+ "description": "Teacher labels for stage 1: Opus labels a fixed sample of 100 training chapters place by place under the exam's own drafting instructions (v1) and guide (1.1), and novel_ner.teacher turns the answers into a weak-label build (labels_T) next to the weak S3 labels of the same chapters (labels_W), so the tagger's A1/A2 and B1/B2 arms differ in labels only. Sample: the training pool is chapters 1-780 of the training snapshot minus the 31 dev chapters (749 chapters), sorted by number and cut into 8 equal-count ranges; novel_ner.sample_test.stratified_order (seed 20261004) spreads the ranges evenly, and the first 100 chapters form packs teach_b01..teach_b20 of 5. A dev pilot pack (teach_dev_b01) holds 5 of the dev chapters (seed 20261004) for measuring the teacher's agreement with the dev answers (GPT-drafted, user-adjudicated: the exam setter's conventions, not absolute quality). Pilot first: teach_b01, teach_b02 and teach_dev_b01 (10 training chapters + 5 dev chapters); the other 18 packs follow once the pilot's checks pass (JSON valid, few unlocated mentions, pending share, overlaps, agreement with the weak labels, and a training run on the converted labels). Opus is the teacher control, not a ceiling (a student may score above it). Material scope (the material-scope rules): the teacher sees instructions + guide + chapter text only, never the name knowledge table, answers, adjudication records or review lists; the labels builder opens nothing under data/gold (tests check). No pack may hold a chapter after 780, a dev chapter (except the dev pack), a test, dev2 or test2 chapter. Costs: 21 Opus calls at about 1.0 USD list price each (within the subscription; mind the monthly cap).",
+ "snapshot": "to0990-79dc77f8d354",
+ "dev_config": "configs/annotate_dev.json",
+ "max_train_chapter": 780,
+ "n": 100,
+ "seed": 20261004,
+ "batch_size": 5,
+ "strata": 8,
+ "dev_pilot": {
+  "n": 5,
+  "seed": 20261004
+ },
+ "packs": {
+  "prefix": "teach_b",
+  "dev_prefix": "teach_dev_b",
+  "pilot_training_packs": 2
+ },
+ "chapters_file": "configs/teacher_train100.chapters.json",
+ "frozen": {
+  "instructions_version": "v1",
+  "guide_version": "1.1"
+ },
+ "exclude": {
+  "test": "configs/test_781_990.json",
+  "dev2": "configs/dev2_781_990.json",
+  "test2": "configs/test2_996_1350.json"
+ },
+ "teacher": {
+  "label": "opus_t1",
+  "model": "claude-opus-5-5",
+  "effort": "xhigh",
+  "workers": 3
+ },
+ "weak_build": "20261003-weak_v2",
+ "weak_setting": "S3",
+ "labels_build_id": "20261004-teacher100",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "gold_dev_note": "read by `check` alone, for the dev pilot pack's scores; `labels` never opens it"
+}

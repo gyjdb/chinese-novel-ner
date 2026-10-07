@@ -1,0 +1,73 @@
+{
+ "description": "Error analysis of scoring v9 (runs/20261003-eval-test-v9), added on 2026-10-03: every false positive (误标), false negative (漏标) and abstention (待审) of every v9 system put in a category by the fixed mechanical rules written in src/novel_ner/errors.py (nobody judges whether an answer is right); the new-name result both per occurrence (pre-registered, evaluate's new_name_recall, re-derived and checked) and per distinct name (post hoc). generic_words is the list of the annotation guide v1.1 rule A1 copied exactly (the program checks it against docs/annotation_guide/v1.1.md); the computed task text also named 她, 你 and 我, which A1 does not list, so they are not in it. title_suffixes, category_words and grade_category_pattern are read from configs/weak_v2.json (the same words the weak-label conversions K1 and K3 use). Models pool runs and seeds as in the v9 scoring config.",
+ "eval_run": "runs/20261003-eval-test-v9",
+ "systems": [
+  "gliner_zero_shot",
+  "dictionary",
+  "opus_r1",
+  "opus_r2",
+  "sonnet_r1",
+  "sonnet_r2",
+  "ws_S1_s1",
+  "ws_S1_s2",
+  "ws_S1_s3",
+  "ws_S1b_s1",
+  "ws_S1b_s2",
+  "ws_S1b_s3",
+  "ws_S2raw_s1",
+  "ws_S2raw_s2",
+  "ws_S2raw_s3",
+  "ws_S2_s1",
+  "ws_S2_s2",
+  "ws_S2_s3",
+  "ws_S3_s1",
+  "ws_S3_s2",
+  "ws_S3_s3",
+  "ws_S3b_s1",
+  "ws_S3b_s2",
+  "ws_S3b_s3"
+ ],
+ "new_names": {
+  "cutoff_chapter": 780
+ },
+ "guide": "docs/annotation_guide/v1.1.md",
+ "generic_words": [
+  "玩家",
+  "女人",
+  "男人",
+  "他",
+  "您",
+  "富二代",
+  "大学生",
+  "小姑娘"
+ ],
+ "rule_words_from": "configs/weak_v2.json",
+ "examples": {
+  "top_n": 15,
+  "context_chars": 12,
+  "groups": {
+   "ws_S3": [
+    "ws_S3_s1",
+    "ws_S3_s2",
+    "ws_S3_s3"
+   ],
+   "opus_r1": [
+    "opus_r1"
+   ],
+   "sonnet_r1": [
+    "sonnet_r1"
+   ],
+   "gliner_zero_shot": [
+    "gliner_zero_shot"
+   ]
+  }
+ },
+ "elsewhere_section": {
+  "label": "ws_S3",
+  "systems": [
+   "ws_S3_s1",
+   "ws_S3_s2",
+   "ws_S3_s3"
+  ]
+ }
+}

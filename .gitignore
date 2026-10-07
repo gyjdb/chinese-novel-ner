@@ -1,0 +1,18 @@
+# Novel text and anything derived from it
+/data/
+/runs/*/predictions*
+/runs/*/checkpoints/
+*.pt
+*.bin
+*.safetensors
+*.onnx
+
+# Environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.cache/
+.env
+.env.*
+

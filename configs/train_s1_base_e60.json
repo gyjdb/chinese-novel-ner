@@ -1,0 +1,45 @@
+{
+ "description": "Longer schedule (60 epochs, about 1920 planned steps) for a run of train_s1_base.json that the sufficiency rule flagged (an insufficient run is re-run with more epochs and both are recorded): the first such run was 20261004-tag-T-s2-s1base, whose best checkpoint (step 1216 of 1280) fell among its last two evaluations. Everything else is train_s1_base.json; the re-run replaces the flagged run in the arm's seed set, the flagged run stays recorded. Stage 1 arms A1 and A2: the base backbone hfl/chinese-roberta-wwm-ext trained on the 100 teacher chapters of weak build 20261004-teacher100 (novel_ner.teacher labels), setting W = the weak S3 labels of those chapters (A1, the control) or T = the Opus teacher labels of the very same chapters (A2); A2 - A1 is the effect of the labels at equal chapters and equal count. Training sufficiency (do not copy the old schedule mechanically): 100 chapters give about 500 windows (749 chapters gave 3751, about 5 per chapter), so batch 16 is about 32 steps per epoch and max_epochs 40 plans about 1300 steps, the same order as S3's 1410 planned steps on 749 chapters; the old 6-epoch, eval-every-half-epoch, patience-3 schedule stopped the 100-chapter learning-curve run after 45 steps with non-person F1 0. Dev (the 31 answered dev chapters) is scored every 2 epochs (about 64 steps) with patience 6 evaluations (12 epochs without a gain); lr 3e-5 as train_v2 for base; batch 16, grad_accumulation 1 (base fits in memory). The checkpoint rule is unchanged (best dev micro F1, ties earlier); metrics.json records 'sufficiency' (best checkpoint not in the last two evaluations and the last three within 0.005, or stopped by patience; non-person F1 0 at the chosen checkpoint = insufficient), and an insufficient run is rerun with more epochs and noted. Three seeds per arm. Nothing was tuned on dev2 or on the test; all decisions are made on dev2 (the material-scope rules), the 60-chapter test is only reported, test2 stays sealed. Chunking, loss, optimizer, quote_map and determinism as train_v2.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261004-teacher100",
+ "settings_intended": [
+  "W",
+  "T"
+ ],
+ "arms": {
+  "W": "A1 (weak S3 labels, 100 chapters)",
+  "T": "A2 (Opus teacher labels, the same 100 chapters)"
+ },
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261003-134049_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 3e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "grad_accumulation": 1,
+ "max_epochs": 60,
+ "eval_every": 2.0,
+ "patience": 6,
+ "planned_steps_note": "about 500 windows / 16 = about 32 steps per epoch x 40 epochs = about 1300 steps (S3 on 749 chapters: 235 x 6 = 1410); the exact numbers are in each run's metrics.json schedule",
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {
+  "“": "「",
+  "”": "」",
+  "‘": "『",
+  "’": "』",
+  "…": "⋯",
+  "—": "─"
+ }
+}

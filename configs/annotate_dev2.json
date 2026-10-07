@@ -1,0 +1,7 @@
+{
+ "description": "Annotation page for the decision chapters dev2 (stage 0): the 25 chapters of configs/dev2_781_990.json in that order (positions 61-85 of the stratified test order, chapters 781-990 outside the 60 test chapters). Each chapter arrives prefilled from two GPT passes (novel_ner.adjudicate --set dev2); the annotator only settles the pending marks. Every stage 1 and 2 decision is made on dev2; it is never training material.",
+ "set": "dev2",
+ "snapshot": "to0990-79dc77f8d354",
+ "guide_version": "1.1",
+ "chapters_from_config": "configs/dev2_781_990.json"
+}

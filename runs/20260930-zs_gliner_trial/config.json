@@ -1,0 +1,171 @@
+{
+ "run_id": "20260930-zs_gliner_trial",
+ "config_file": "configs/zs_gliner_trial.json",
+ "config": {
+  "description": "Zero-shot GLiNER trial: how to feed Chinese (word splitter, space marks, tokenizer fix) and which label language; compared with the LLM extraction, not gold. The sampled chapters are development chapters: keep them out of the gold set.",
+  "snapshot": "to0990-79dc77f8d354",
+  "sample": {
+   "seed": 20260930,
+   "n": 30,
+   "max_chapter": 780,
+   "exclude_numbers": [
+    225,
+    229,
+    238
+   ],
+   "reference_model_prefix": "claude-opus"
+  },
+  "chunk_max_chars": 200,
+  "batch_size": 16,
+  "save_threshold": 0.1,
+  "report_thresholds": [
+   0.3,
+   0.4,
+   0.5,
+   0.6,
+   0.7,
+   0.8,
+   0.85,
+   0.9,
+   0.93,
+   0.95
+  ],
+  "labels": {
+   "en": {
+    "person": "person",
+    "organization": "organization",
+    "location": "location",
+    "dungeon": "dungeon",
+    "item": "item",
+    "trait": "trait"
+   },
+   "zh": {
+    "person": "人物",
+    "organization": "组织",
+    "location": "地点",
+    "dungeon": "副本",
+    "item": "道具",
+    "trait": "特性"
+   }
+  },
+  "variants": [
+   {
+    "name": "whitespace-perword-en",
+    "splitter": "whitespace",
+    "space_mode": "per_word",
+    "labels": "en"
+   },
+   {
+    "name": "char-perword-en-nofix",
+    "splitter": "char",
+    "space_mode": "per_word",
+    "labels": "en",
+    "fix_normalizer": false
+   },
+   {
+    "name": "char-perword-en",
+    "splitter": "char",
+    "space_mode": "per_word",
+    "labels": "en"
+   },
+   {
+    "name": "char-perword-zh",
+    "splitter": "char",
+    "space_mode": "per_word",
+    "labels": "zh"
+   },
+   {
+    "name": "char-natural-en",
+    "splitter": "char",
+    "space_mode": "natural",
+    "labels": "en"
+   },
+   {
+    "name": "char-natural-zh",
+    "splitter": "char",
+    "space_mode": "natural",
+    "labels": "zh"
+   },
+   {
+    "name": "jieba-perword-en",
+    "splitter": "jieba",
+    "space_mode": "per_word",
+    "labels": "en"
+   },
+   {
+    "name": "jieba-perword-zh",
+    "splitter": "jieba",
+    "space_mode": "per_word",
+    "labels": "zh"
+   },
+   {
+    "name": "jieba-natural-en",
+    "splitter": "jieba",
+    "space_mode": "natural",
+    "labels": "en"
+   },
+   {
+    "name": "jieba-natural-zh",
+    "splitter": "jieba",
+    "space_mode": "natural",
+    "labels": "zh"
+   }
+  ]
+ },
+ "snapshot": {
+  "id": "to0990-79dc77f8d354",
+  "source_commit": "d171fe4e5013d77ac069396a080f9f32152bc79d"
+ },
+ "chapters": [
+  "ch0028",
+  "ch0033",
+  "ch0046",
+  "ch0057",
+  "ch0092",
+  "ch0187",
+  "ch0235",
+  "ch0292",
+  "ch0324",
+  "ch0366",
+  "ch0424",
+  "ch0437",
+  "ch0449",
+  "ch0482",
+  "ch0487",
+  "ch0518",
+  "ch0522",
+  "ch0554",
+  "ch0589",
+  "ch0607",
+  "ch0637",
+  "ch0654",
+  "ch0664",
+  "ch0668",
+  "ch0700",
+  "ch0733",
+  "ch0738",
+  "ch0745",
+  "ch0756",
+  "ch0777"
+ ],
+ "model": {
+  "id": "urchade/gliner_multi-v2.1",
+  "revision": "443d26d654e0324125a96bebd8e796c14ff2efe6",
+  "backbone": "microsoft/mdeberta-v3-base",
+  "backbone_revision": "a0484667b22365f84929a935b5e50a51f71f159d"
+ },
+ "reference": "weak/mentions.jsonl (LLM extraction; not gold)",
+ "code": {
+  "commit": "05390718ff357814e69364f92c416947dd5947a7",
+  "dirty": false
+ },
+ "environment": {
+  "python": "3.13.13",
+  "torch": "2.11.0+cu128",
+  "transformers": "5.16.1",
+  "tokenizers": "0.23.2",
+  "gliner": "0.2.29",
+  "gpu": "NVIDIA GeForce RTX 5080"
+ },
+ "started_at": "2026-09-30T12:40:51-0700"
+}

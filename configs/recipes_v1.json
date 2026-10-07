@@ -1,0 +1,27 @@
+{
+ "description": "Rounds 5 and 6: with the materials fixed (weak S3 labels of the 749 training chapters for stage 1, the ORIGINAL teacher labels of the 100 chapters, build 20261004-teacher100, for stage 2; no new chapters, no second Opus pass) and A3 as the baseline, compare a limited set of training recipes and one or two other Chinese base backbones, every candidate with the same tuning opportunity, along the same two-stage route (stage 1: S3 recipe on the weak labels; stage 2: fine-tune on the teacher labels). Selection on dev2 by the rule below; test2 stays sealed. Goal: overall and new-name performance, not particular names. Written before any round 5 or 6 run.",
+ "baseline": {"model": "A3", "runs": ["runs/20261004-tag-T-s1-s1a3", "runs/20261004-tag-T-s2-s1a3", "runs/20261004-tag-T-s3-s1a3"], "recipe": "configs/train_s1_base_a3.json (stage 2 lr 3e-5, 40 epochs max, eval every 2 epochs, patience 6, from the S3 checkpoints runs/20261003-tag-S3-s{seed}-dev31)", "dev2": {"micro_f1": 0.9129, "non_person_f1": 0.775, "new_name_recall": 0.8391}},
+ "round5_recipes": {
+  "what_changes": "only the stage 2 fine-tuning recipe; backbone hfl/chinese-roberta-wwm-ext, stage 1 checkpoints and labels as A3",
+  "candidates": {
+   "lr2e5": {"config": "configs/train_s5_a3_lr2e5.json", "change": "stage 2 learning rate 2e-5 (A3: 3e-5)"},
+   "lr5e5": {"config": "configs/train_s5_a3_lr5e5.json", "change": "stage 2 learning rate 5e-5"},
+   "mix11": {"config": "configs/train_s5_a3_mix11.json", "change": "replay: every epoch trains on all teacher windows of the 100 chapters plus an equal number of weak S3 windows sampled (with the run seed) from the other 649 training chapters, so the knowledge of the 749-chapter stage is not overwritten while the teacher conventions are learned (ratio 1:1); everything else as A3"},
+   "mix13": {"config": "configs/train_s5_a3_mix13.json", "change": "replay with three weak windows per teacher window (ratio 1:3); everything else as A3"}
+  },
+  "seeds": [1, 2, 3],
+  "lr_grid_note": "the three learning rates 2e-5 / 3e-5 (= A3) / 5e-5 form the grid every backbone of round 6 also gets; the replay candidates are tried at the baseline rate only",
+  "pairs": [["lr2e5", "A3"], ["lr5e5", "A3"], ["mix11", "A3"], ["mix13", "A3"], ["opus_t1", "A3"]]
+ },
+ "round6_backbones": {
+  "what_changes": "only the backbone; both stages are re-run for the new backbone: stage 1 = the S3 recipe (configs/train_v2.json settings) on weak build 20261003-weak_v2 setting S3, seeds 1-3; stage 2 = the A3 recipe at each of the three learning rates of the grid, seeds 1-3 (9 runs per backbone)",
+  "candidates": [
+   {"id": "hfl/chinese-macbert-base", "why": "same team, vocabulary and pre-training corpus as the RoBERTa-wwm-ext used so far, MLM-as-correction pre-training; reported above RoBERTa-wwm-ext on CLUE; about 400 MB (pytorch_model.bin), Apache-2.0", "status": "download needs approval"},
+   {"id": "hfl/chinese-lert-base", "why": "same team and vocabulary, pre-trained with linguistic tasks (POS, NER, dependency); its paper reports gains on MSRA and People's Daily NER over RoBERTa-wwm-ext and MacBERT; about 400 MB, Apache-2.0", "status": "download needs approval"}
+  ],
+  "roberta_reference": "hfl/chinese-roberta-wwm-ext gets the same grid in round 5 (lr2e5, A3, lr5e5), so the backbones are compared at equal tuning opportunity",
+  "pairs_rule": "for each backbone the stage 2 learning rate with the highest mean dev2 micro F1 over the 3 seeds is its selected recipe (reported with the whole grid); pre-set pairs: selected(macbert) - selected(roberta), selected(lert) - selected(roberta), and each selected - A3"
+ },
+ "selection_rule": "decisions on dev2 (data/gold/dev2/20261004-130201_guide-v1.1.json): a candidate counts as better than the baseline when micro F1 is at least +0.01 with both interval kinds above 0 and non-person F1 and new-name recall are not worse (intervals reaching above 0); otherwise the point, both intervals and their widths are reported without a verdict word. Selecting the learning rate on dev2 makes dev2 scores of the selected recipe optimistic; the sealed test2 is the independent check at the end.",
+ "sufficiency": "every run keeps the sufficiency record; a flagged run is re-run under a longer schedule and both are recorded, as in rounds 1-4"
+}

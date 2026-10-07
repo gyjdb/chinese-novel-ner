@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>名字标注</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #1f2328; --muted: #667085; --line: #e3e1da;
+  --accent: #2f5bd3; --warn: #b42318; --ok: #067647;
+  --sel: #ffe27a; --flash: #ffb4a6;
+  --person: #dbe7ff; --person-ink: #1d4ed8;
+  --organization: #ebe3ff; --organization-ink: #6d28d9;
+  --location: #d6f3e0; --location-ink: #15803d;
+  --dungeon: #ffe1dc; --dungeon-ink: #c2410c;
+  --item: #fff0c4; --item-ink: #a16207;
+  --trait: #d3f2f6; --trait-ink: #0e7490;
+  --pending: #eceff3; --pending-ink: #475467;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171c; --panel: #1d2027; --ink: #e6e8ec; --muted: #9aa3b2; --line: #2d323c;
+    --accent: #7aa2ff; --warn: #ff8a7a; --ok: #6fd39b;
+    --sel: #6b5a12; --flash: #7a3326;
+    --person: #1f3358; --person-ink: #a5c4ff;
+    --organization: #33285a; --organization-ink: #cbb8ff;
+    --location: #173d29; --location-ink: #93e2b0;
+    --dungeon: #4a2621; --dungeon-ink: #ffb4a2;
+    --item: #43391a; --item-ink: #f3d27a;
+    --trait: #163d44; --trait-ink: #91e4ef;
+    --pending: #2b3039; --pending-ink: #c3cad6;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); display: flex; flex-direction: column;
+  font: 14px/1.6 system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+header {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--panel);
+}
+header h1 { font-size: 15px; margin: 0; }
+header .grow { flex: 1; }
+header input[type=search] { width: 15em; }
+main { flex: 1; min-height: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr) 370px; }
+#nav { overflow: auto; border-right: 1px solid var(--line); padding: 8px; }
+#reader { overflow: auto; padding: 20px 28px 120px; }
+#reader .inner { max-width: 46em; margin: 0 auto; }
+#reader h2 { font-size: 18px; margin: 0 0 4px; }
+#reader .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 16px; }
+.para { font-size: 18px; line-height: 2.1; margin: 0 0 .75em; user-select: none; -webkit-user-select: none; }
+.c { cursor: text; }
+.ann { padding: 3px 0; }
+.t-person { background: var(--person); }
+.t-organization { background: var(--organization); }
+.t-location { background: var(--location); }
+.t-dungeon { background: var(--dungeon); }
+.t-item { background: var(--item); }
+.t-trait { background: var(--trait); }
+.pending { background: var(--pending); box-shadow: inset 0 -2px 0 var(--pending-ink); }
+.a-start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.a-end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.active { box-shadow: inset 0 -3px 0 var(--accent); }
+.sel { background: var(--sel) !important; }
+.flash { background: var(--flash) !important; }
+sup.tag { font-size: 11px; margin: 0 4px 0 1px; cursor: pointer; user-select: none; -webkit-user-select: none; }
+sup.tag.k-person { color: var(--person-ink); }
+sup.tag.k-organization { color: var(--organization-ink); }
+sup.tag.k-location { color: var(--location-ink); }
+sup.tag.k-dungeon { color: var(--dungeon-ink); }
+sup.tag.k-item { color: var(--item-ink); }
+sup.tag.k-trait { color: var(--trait-ink); }
+sup.tag.k-pending { color: var(--pending-ink); }
+#side { overflow: auto; border-left: 1px solid var(--line); padding: 10px 12px 80px; background: var(--panel); }
+.card { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+.card h3 { margin: 0 0 6px; font-size: 14px; }
+.muted { color: var(--muted); font-size: 12.5px; }
+.warn { color: var(--warn); }
+.ok { color: var(--ok); }
+.row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+button, select {
+  font: inherit; font-size: 13px; padding: 4px 9px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--bg); color: var(--ink); cursor: pointer;
+}
+button:hover:not(:disabled), select:hover { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.danger { color: var(--warn); }
+.types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 6px 0; }
+.types button { padding: 6px 4px; }
+.types button.on { outline: 2px solid var(--accent); }
+.tb-person { background: var(--person); color: var(--person-ink); }
+.tb-organization { background: var(--organization); color: var(--organization-ink); }
+.tb-location { background: var(--location); color: var(--location-ink); }
+.tb-dungeon { background: var(--dungeon); color: var(--dungeon-ink); }
+.tb-item { background: var(--item); color: var(--item-ink); }
+.tb-trait { background: var(--trait); color: var(--trait-ink); }
+.tb-pending { background: var(--pending); color: var(--pending-ink); }
+textarea, input[type=text], input[type=search] {
+  width: 100%; font: inherit; font-size: 13px; padding: 5px 7px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--bg); color: var(--ink);
+}
+header input[type=search] { width: 15em; }
+textarea { min-height: 3.2em; resize: vertical; }
+label.block { display: block; margin: 6px 0 2px; font-size: 12.5px; color: var(--muted); }
+label.check { display: flex; gap: 6px; align-items: flex-start; margin: 4px 0; font-size: 13px; }
+.cand { border-top: 1px solid var(--line); padding: 6px 0; }
+.cand.skipped { opacity: .55; }
+.ctx { font-size: 14px; word-break: break-all; }
+.ctx b { background: var(--sel); font-weight: normal; padding: 0 1px; }
+.chap { display: block; width: 100%; text-align: left; border: none; background: none; padding: 5px 6px; border-radius: 6px; }
+.chap.cur { background: var(--bg); outline: 1px solid var(--line); }
+.chap .st { float: right; color: var(--muted); font-size: 12px; }
+.ev { font-size: 12.5px; margin: 3px 0; word-break: break-all; }
+#toast {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 30;
+  background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-size: 13px; display: none;
+}
+#modal { position: fixed; inset: 0; background: rgba(0, 0, 0, .38); display: flex; justify-content: center; align-items: flex-start; padding: 5vh 16px; z-index: 20; }
+#modal[hidden] { display: none; }
+#modal .box { background: var(--panel); border-radius: 10px; width: 100%; max-width: 920px; max-height: 88vh; overflow: auto; padding: 14px 16px; }
+.hit { padding: 6px 4px; border-top: 1px solid var(--line); cursor: pointer; }
+.hit:hover { background: var(--bg); }
+.hit.here { border-left: 3px solid var(--accent); }
+.para-view { font-size: 16px; line-height: 1.9; margin: 6px 0; }
+.para-view.dim { color: var(--muted); }
+kbd { font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; color: var(--muted); }
+@media (max-width: 1100px) {
+  main { grid-template-columns: 1fr; }
+  #nav { max-height: 150px; border-right: none; border-bottom: 1px solid var(--line); }
+  #side { border-left: none; border-top: 1px solid var(--line); }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>名字标注</h1>
+  <span class="muted" id="meta"></span>
+  <span class="grow"></span>
+  <form id="search-form" class="row" style="margin:0">
+    <input type="search" id="search-q" placeholder="全书搜索（找跨章证据）">
+    <button type="submit">搜索</button>
+  </form>
+  <button id="export-btn" class="primary">导出</button>
+  <button id="import-btn">导入</button>
+  <input type="file" id="import-file" accept=".json,application/json" hidden>
+  <span class="muted" id="save-status"></span>
+</header>
+<main>
+  <nav id="nav"></nav>
+  <section id="reader"></section>
+  <aside id="side"></aside>
+</main>
+<div id="modal" hidden><div class="box" id="modal-box"></div></div>
+<div id="toast"></div>
+<script id="page-data" type="application/json">/*__DATA__*/</script>
+<script>
+(() => {
+'use strict';
+
+const DATA = JSON.parse(document.getElementById('page-data').textContent);
+const TYPES = [
+  ['person', '人物', '人'], ['organization', '组织', '组'], ['location', '地点', '地'],
+  ['dungeon', '副本', '副'], ['item', '物品', '物'], ['trait', '特性', '特'],
+].map(([key, zh, tag]) => ({ key, zh, tag }));
+const TYPE = Object.fromEntries(TYPES.map(t => [t.key, t]));
+const STORE_KEY = `novel-ner-annotate:${DATA.set}:${DATA.snapshot_id}`;
+const STATUS_ZH = { todo: '未开始', doing: '进行中', done: '已完成' };
+// guide v1.1 E2: a pending mark says where it is stuck
+const STUCK = [['qualification', '名称资格（是不是名字）'], ['boundary', '名称边界（框多长）'], ['type', '实体类型（哪一类）']];
+const STUCK_REQUIRED = DATA.guide_version !== '1.0';
+// who produced this chapter's annotations; the formal test only accepts "manual"
+const PROVENANCE = [
+  ['manual', '自己标（没有模型参与）'],
+  ['manual_model_checked', '自己标，模型查过漏'],
+  ['model_draft_reviewed', '模型初标，自己逐条复核'],
+  ['model_double_adjudicated', '模型标两遍，自己裁决分歧'],
+];
+const STATUS_MARK = { todo: '○', doing: '◐', done: '●' };
+const $ = q => document.querySelector(q);
+const reader = $('#reader'), side = $('#side'), nav = $('#nav'), modal = $('#modal'), modalBox = $('#modal-box');
+
+// ---------- chapters: text = paragraphs joined by "\n"; offsets are [start, end) characters ----------
+const CH = {};
+for (const c of DATA.chapters) {
+  const starts = [];
+  let off = 0;
+  for (const [, t] of c.paragraphs) { starts.push(off); off += t.length + 1; }
+  CH[c.chapter_id] = { ...c, text: c.paragraphs.map(p => p[1]).join('\n'), starts };
+}
+const ORDER = DATA.chapters.map(c => c.chapter_id);
+
+function paraIndex(cid, i) {
+  const s = CH[cid].starts;
+  let lo = 0, hi = s.length - 1;
+  while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (s[mid] <= i) lo = mid; else hi = mid - 1; }
+  return lo;
+}
+
+// ---------- state (autosaved in this browser; the exported file is the real record) ----------
+const nowISO = () => new Date().toISOString();
+function blankChapter(c) {
+  return {
+    content_hash: c.content_hash, text_sha256: c.text_sha256, status: 'todo', provenance: null,
+    checks: { occurrences: false, full_read: false, records: false },
+    seconds: 0, annotations: [], skipped: [], note: '',
+  };
+}
+function newState() {
+  const chapters = {};
+  for (const c of DATA.chapters) chapters[c.chapter_id] = blankChapter(c);
+  return {
+    format: 'novel-ner-annotation/1', set: DATA.set, snapshot_id: DATA.snapshot_id,
+    guide_version: DATA.guide_version, text_rule: DATA.text_rule, page_generated_at: DATA.generated_at,
+    created_at: nowISO(), updated_at: null, exported_at: null, current: ORDER[0], next_id: 1,
+    chapters, precedents: [],
+  };
+}
+function adopt(s) {
+  if (!s || s.format !== 'novel-ner-annotation/1') throw new Error('不是这个标注页导出的文件');
+  if (s.set !== DATA.set || s.snapshot_id !== DATA.snapshot_id) {
+    throw new Error(`文件属于 ${s.set} / ${s.snapshot_id}，本页是 ${DATA.set} / ${DATA.snapshot_id}`);
+  }
+  for (const c of DATA.chapters) {
+    const st = s.chapters[c.chapter_id];
+    if (!st) s.chapters[c.chapter_id] = blankChapter(c);
+    else if (st.content_hash !== c.content_hash) throw new Error(`第${c.number}章的原文版本和本页不一致`);
+  }
+  if (s.guide_version !== DATA.guide_version) {
+    s.guide_versions_seen = [...new Set([...(s.guide_versions_seen || [s.guide_version]), DATA.guide_version])];
+    s.guide_version = DATA.guide_version;
+  }
+  if (!ORDER.includes(s.current)) s.current = ORDER[0];
+  return s;
+}
+let storageOK = true, lastSaved = null, saveTimer = null;
+function loadSaved() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? adopt(JSON.parse(raw)) : null;
+  } catch (e) { console.warn(e); return null; }
+}
+let state = loadSaved();
+const restored = !!state;
+if (!state) state = newState();
+
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); storageOK = true; lastSaved = new Date(); }
+  catch (e) { storageOK = false; }
+  renderHeader();
+}
+function changed() {
+  state.updated_at = nowISO();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 300);
+}
+
+// ---------- undo ----------
+const undoStack = [];
+function remember() {
+  undoStack.push({ cid: state.current, snap: JSON.stringify(state.chapters[state.current]) });
+  if (undoStack.length > 80) undoStack.shift();
+}
+function undo() {
+  const u = undoStack.pop();
+  if (!u) return toast('没有可撤销的操作');
+  const seconds = state.chapters[u.cid].seconds;
+  state.chapters[u.cid] = JSON.parse(u.snap);
+  state.chapters[u.cid].seconds = seconds;
+  state.current = u.cid; sel = null; active = null; refreshCandidates();
+  changed(); renderAll(); toast('已撤销');
+}
+
+// ---------- ui state ----------
+let sel = null;      // new selection {start, end}
+let active = null;   // selected annotation id
+let drag = null;
+let cands = null;    // same-string candidates {text, type, rows}
+let flash = null;
+let searchState = null;
+
+const cur = () => state.current;
+const st = () => state.chapters[state.current];
+const ch = () => CH[state.current];
+const byId = id => st().annotations.find(a => a.id === id) || null;
+const annAt = i => st().annotations.find(a => a.start <= i && i < a.end) || null;
+const overlapping = (start, end, exceptId) =>
+  st().annotations.find(a => a.id !== exceptId && a.start < end && start < a.end) || null;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtTime = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+function ctxHTML(text, start, end, w = 14) {
+  const left = text.slice(Math.max(0, start - w), start).split('\n').pop();
+  const right = text.slice(end, end + w).split('\n')[0];
+  return `${start - w > 0 ? '…' : ''}${esc(left)}<b>${esc(text.slice(start, end))}</b>${esc(right)}…`;
+}
+let toastTimer = null;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2600);
+}
+
+// ---------- editing ----------
+function createAnnotation(start, end, type, openCands) {
+  const c = ch(), s = st();
+  if (!(Number.isInteger(start) && Number.isInteger(end) && 0 <= start && start < end && end <= c.text.length)) return null;
+  if (c.text.slice(start, end).includes('\n')) { toast('名字不能跨段'); return null; }
+  const clash = overlapping(start, end);
+  if (clash) { toast(`和已有标注「${clash.text}」重叠：平面标注不嵌套，先删掉或改那一处`); return null; }
+  remember();
+  const t = nowISO();
+  const a = {
+    id: 'a' + (state.next_id++), start, end, text: c.text.slice(start, end),
+    type: type === 'pending' ? null : type, pending: type === 'pending',
+    candidates: '', doubt: '', stuck: [], cross_chapter: false, evidence: [], note: '',
+    guide_version: DATA.guide_version, created_at: t, updated_at: t,
+  };
+  s.annotations.push(a);
+  s.annotations.sort((x, y) => x.start - y.start);
+  if (s.status === 'todo') s.status = 'doing';
+  sel = null; active = a.id;
+  if (openCands) openCandidates(a.text, a.pending ? 'pending' : a.type); else refreshCandidates();
+  changed(); renderAll();
+  return a;
+}
+function retype(id, type) {
+  const a = byId(id);
+  if (!a) return;
+  remember();
+  if (type === 'pending') { a.pending = true; a.type = null; } else { a.pending = false; a.type = type; }
+  a.updated_at = nowISO();
+  changed(); renderAll();
+}
+function applyType(type) {
+  if (sel) return createAnnotation(sel.start, sel.end, type, true);
+  if (active) return retype(active, type);
+  toast('先在正文里拖选一段字（单个字直接点），或点一处已有标注');
+}
+function removeAnnotation(id) {
+  remember();
+  const s = st();
+  s.annotations = s.annotations.filter(a => a.id !== id);
+  if (active === id) active = null;
+  refreshCandidates(); changed(); renderAll();
+}
+function adjust(which, d) {
+  const c = ch();
+  if (sel) {
+    let { start, end } = sel;
+    if (which === 'start') start += d; else end += d;
+    if (start < 0 || end > c.text.length || end <= start || c.text.slice(start, end).includes('\n')) return;
+    sel = { start, end }; renderReader(); renderSide();
+  } else if (active) {
+    const a = byId(active);
+    if (!a) return;
+    let { start, end } = a;
+    if (which === 'start') start += d; else end += d;
+    if (start < 0 || end > c.text.length || end <= start || c.text.slice(start, end).includes('\n')) return;
+    if (overlapping(start, end, a.id)) return toast('会和旁边的标注重叠');
+    remember();
+    Object.assign(a, { start, end, text: c.text.slice(start, end), updated_at: nowISO() });
+    refreshCandidates(); changed(); renderAll();
+  }
+}
+function selectAnnotation(id) { active = id; sel = null; renderReader(); renderSide(); }
+
+// ---------- same-string candidates (a hint, never applied automatically) ----------
+function openCandidates(text, type) { cands = { text, type, rows: [] }; refreshCandidates(); }
+function refreshCandidates() {
+  if (!cands) return;
+  const c = ch(), s = st(), rows = [];
+  for (let from = 0; ;) {
+    const i = c.text.indexOf(cands.text, from);
+    if (i < 0) break;
+    from = i + 1;
+    const e = i + cands.text.length;
+    if (s.annotations.some(a => a.start < e && i < a.end)) continue;
+    rows.push({ start: i, end: e, skipped: s.skipped.some(k => k.start === i && k.end === e) });
+  }
+  cands.rows = rows;
+}
+function setSkipped(start, end, on) {
+  remember();
+  const s = st();
+  s.skipped = s.skipped.filter(k => !(k.start === start && k.end === end));
+  if (on) s.skipped.push({ start, end, text: ch().text.slice(start, end), at: nowISO() });
+  refreshCandidates(); changed(); renderSide();
+}
+function locate(start, end) {
+  flash = { start, end }; renderReader();
+  const el = reader.querySelector(`.c[data-i="${start}"]`);
+  if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  setTimeout(() => { flash = null; renderReader(); }, 1600);
+}
+
+// ---------- rendering ----------
+function renderHeader() {
+  $('#meta').textContent = `${DATA.set} · 快照 ${DATA.snapshot_id} · 规则 v${DATA.guide_version}`;
+  const parts = [];
+  if (!storageOK) parts.push('<span class="warn">浏览器无法自动保存，请勤导出</span>');
+  else if (lastSaved) parts.push(`已自动保存 ${lastSaved.toLocaleTimeString()}`);
+  const unexported = state.updated_at && (!state.exported_at || state.updated_at > state.exported_at);
+  if (unexported) parts.push('<span class="warn">有改动还没导出</span>');
+  else if (state.exported_at) parts.push(`<span class="ok">已导出 ${new Date(state.exported_at).toLocaleString()}</span>`);
+  $('#save-status').innerHTML = parts.join(' · ');
+}
+function renderNav() {
+  nav.innerHTML = ORDER.map((cid, k) => {
+    const c = CH[cid], s = state.chapters[cid];
+    return `<button class="chap ${cid === cur() ? 'cur' : ''}" data-act="goto" data-cid="${cid}">
+      ${k + 1}. 第${c.number}章 <span class="muted">${esc(c.title || '')}</span>
+      <span class="st">${STATUS_MARK[s.status]} ${s.annotations.length}</span></button>`;
+  }).join('');
+}
+function renderReader() {
+  const c = ch(), s = st();
+  const owner = new Array(c.text.length).fill(null);
+  for (const a of s.annotations) for (let i = a.start; i < a.end; i++) owner[i] = a;
+  const inner = document.createElement('div');
+  inner.className = 'inner';
+  const h = document.createElement('h2');
+  h.textContent = `第${c.number}章 ${c.title || ''}`;
+  const sub = document.createElement('div');
+  sub.className = 'sub';
+  sub.textContent = `${c.chapter_id} · ${c.paragraphs.length} 段 · ${c.text.length} 字 · 章节标题不标`;
+  inner.append(h, sub);
+  c.paragraphs.forEach(([pid, t], k) => {
+    const p = document.createElement('p');
+    p.className = 'para';
+    p.dataset.pid = pid;
+    const base = c.starts[k];
+    for (let j = 0; j < t.length; j++) {
+      const i = base + j;
+      const span = document.createElement('span');
+      span.className = 'c';
+      span.dataset.i = i;
+      span.textContent = t[j];
+      const a = owner[i];
+      if (a) {
+        span.classList.add('ann', a.pending ? 'pending' : 't-' + a.type);
+        if (i === a.start) span.classList.add('a-start');
+        if (i === a.end - 1) span.classList.add('a-end');
+        if (a.id === active) span.classList.add('active');
+      }
+      if (sel && i >= sel.start && i < sel.end) span.classList.add('sel');
+      if (flash && i >= flash.start && i < flash.end) span.classList.add('flash');
+      p.appendChild(span);
+      if (a && i === a.end - 1) {
+        const tag = document.createElement('sup');
+        tag.className = 'tag k-' + (a.pending ? 'pending' : a.type);
+        tag.dataset.ann = a.id;
+        tag.textContent = (a.pending ? '审' : TYPE[a.type].tag) + (a.cross_chapter ? '↗' : '');
+        p.appendChild(tag);
+      }
+    }
+    inner.appendChild(p);
+  });
+  reader.replaceChildren(inner);
+}
+function typeButtons(current) {
+  return `<div class="types">${TYPES.map((t, k) =>
+    `<button class="tb-${t.key} ${current === t.key ? 'on' : ''}" data-act="type" data-type="${t.key}"><kbd>${k + 1}</kbd> ${t.zh}</button>`).join('')}
+    <button class="tb-pending ${current === 'pending' ? 'on' : ''}" data-act="type" data-type="pending"><kbd>7</kbd> 待审</button></div>`;
+}
+function boundaryButtons() {
+  return `<div class="row"><span class="muted">边界</span>
+    <button data-act="adj" data-which="start" data-d="-1" title="Ctrl+←">◀ 左扩</button>
+    <button data-act="adj" data-which="start" data-d="1" title="Ctrl+→">左缩 ▶</button>
+    <button data-act="adj" data-which="end" data-d="-1" title="Shift+←">◀ 右缩</button>
+    <button data-act="adj" data-which="end" data-d="1" title="Shift+→">右扩 ▶</button></div>`;
+}
+function selectionCard() {
+  const c = ch();
+  if (sel) {
+    const pid = c.paragraphs[paraIndex(cur(), sel.start)][0];
+    return `<div class="card"><h3>新选中：「${esc(c.text.slice(sel.start, sel.end))}」</h3>
+      <div class="muted">第 ${sel.start}–${sel.end} 字 · 段 ${pid} · 先判断是不是名字，再定边界，最后定类型</div>
+      ${boundaryButtons()}${typeButtons(null)}
+      <div class="muted"><kbd>Esc</kbd> 取消</div></div>`;
+  }
+  const a = active && byId(active);
+  if (a) {
+    const pid = c.paragraphs[paraIndex(cur(), a.start)][0];
+    const label = a.pending ? '待审' : TYPE[a.type].zh;
+    const evidence = a.evidence.map((e, k) => `<div class="ev">第${e.chapter_number}章 ${esc(e.paragraph_id)}：「${esc(e.quote)}」
+        <button data-act="ev-del" data-k="${k}">移除</button></div>`).join('');
+    return `<div class="card"><h3>「${esc(a.text)}」 <span class="muted">${label}</span></h3>
+      <div class="muted">第 ${a.start}–${a.end} 字 · 段 ${pid} · 按规则 v${esc(a.guide_version)} 标</div>
+      ${typeButtons(a.pending ? 'pending' : a.type)}${boundaryButtons()}
+      ${a.pending ? `<label class="block">候选解释（必填其一）</label><textarea data-field="candidates">${esc(a.candidates)}</textarea>
+        <label class="block">疑点</label><textarea data-field="doubt">${esc(a.doubt)}</textarea>
+        <label class="block">卡在哪一步（可多选）</label>
+        ${STUCK.map(([k, zh]) => `<label class="check"><input type="checkbox" data-stuck="${k}" ${(a.stuck || []).includes(k) ? 'checked' : ''}> ${zh}</label>`).join('')}` : ''}
+      <label class="check"><input type="checkbox" data-act="cross" ${a.cross_chapter ? 'checked' : ''}> 这处裁决依赖跨章证据</label>
+      ${evidence || '<div class="muted">用顶部“全书搜索”找证据，点“加为证据”。</div>'}
+      <label class="block">备注</label><textarea data-field="note">${esc(a.note)}</textarea>
+      <div class="row"><button data-act="same">查本章同字</button><button data-act="prec-prefill">记为判例</button>
+        <button class="danger" data-act="del">删除 <kbd>Del</kbd></button></div></div>`;
+  }
+  return `<div class="card"><h3>选一段字</h3><div class="muted">在正文里按住拖选（单个字直接点）；点已有标注可修改。</div></div>`;
+}
+function candidatesCard() {
+  const c = ch();
+  const open = cands.rows.filter(r => !r.skipped), skipped = cands.rows.filter(r => r.skipped);
+  const typeZh = cands.type === 'pending' ? '待审' : TYPE[cands.type].zh;
+  const row = r => `<div class="cand ${r.skipped ? 'skipped' : ''}">
+      <div class="ctx">${ctxHTML(c.text, r.start, r.end)}</div>
+      <div class="row">${r.skipped
+        ? `<span class="muted">已定为不标</span><button data-act="cand-unskip" data-s="${r.start}" data-e="${r.end}">撤销</button>`
+        : `${cands.type !== 'pending' ? `<button data-act="cand-apply" data-s="${r.start}" data-e="${r.end}" data-type="${cands.type}">标为${typeZh}</button>` : ''}
+           <select data-act="cand-type" data-s="${r.start}" data-e="${r.end}"><option value="">其他类型…</option>
+             ${TYPES.map(t => `<option value="${t.key}">${t.zh}</option>`).join('')}<option value="pending">待审</option></select>
+           <button data-act="cand-skip" data-s="${r.start}" data-e="${r.end}">不标</button>`}
+        <button data-act="locate" data-s="${r.start}" data-e="${r.end}">定位</button></div></div>`;
+  return `<div class="card"><h3>本章同字「${esc(cands.text)}」：还有 ${open.length} 处</h3>
+    <div class="muted">只是提示：每处都要重新判断是不是名字、框多长、什么类型；框法不同就点“定位”回正文自己划。同字提示之外还要通读查漏。</div>
+    ${open.map(row).join('')}${skipped.map(row).join('')}
+    <div class="row"><button data-act="close-cands">关闭</button></div></div>`;
+}
+function chapterCard() {
+  const c = ch(), s = st();
+  const counts = Object.fromEntries(TYPES.map(t => [t.key, 0]));
+  let pending = 0, cross = 0;
+  for (const a of s.annotations) { if (a.pending) pending++; else counts[a.type]++; if (a.cross_chapter) cross++; }
+  const missing = s.annotations.filter(a => a.pending && !a.candidates.trim() && !a.doubt.trim());
+  const noStuck = STUCK_REQUIRED ? s.annotations.filter(a => a.pending && !(a.stuck || []).length) : [];
+  const noEvidence = s.annotations.filter(a => a.cross_chapter && !a.evidence.length);
+  // a chapter merged from two GPT passes only asks for the pending marks to be settled
+  const checkItems = s.provenance === 'model_double_adjudicated'
+    ? [['adjudicated', '待裁决的地方都处理了（定不下的留着待审，写明疑点）']]
+    : [['occurrences', '所有出现位置都逐处处理了（含同字提示）'], ['full_read', '同字提示之外，已通读全文查漏'],
+       ['records', '疑难（待审）和跨章依据都留了记录']];
+  const checksDone = checkItems.every(([k]) => s.checks[k]);
+  const box = (k, text) => `<label class="check"><input type="checkbox" data-check="${k}" ${s.checks[k] ? 'checked' : ''}> ${text}</label>`;
+  const prov = `<label class="block">本章来源</label>
+    <select data-prov="1" style="width:100%"><option value="" ${s.provenance ? '' : 'selected'}>请选择…</option>
+      ${PROVENANCE.map(([k, zh]) => `<option value="${k}" ${s.provenance === k ? 'selected' : ''}>${zh}</option>`).join('')}</select>`;
+  return `<div class="card" id="chapter-card"><h3>本章：第${c.number}章</h3>
+    <div class="muted">${STATUS_ZH[s.status]} · 用时 <span id="timer">${fmtTime(s.seconds)}</span>（页面在前台、两分钟内有操作才计时）</div>
+    <div class="row" style="font-size:13px">${TYPES.map(t => `${t.zh} ${counts[t.key]}`).join(' · ')} · 待审 ${pending} · 跨章 ${cross}</div>
+    ${missing.length ? `<div class="warn muted">有 ${missing.length} 处待审还没写候选解释或疑点</div>` : ''}
+    ${noStuck.length ? `<div class="warn muted">有 ${noStuck.length} 处待审没注明卡在哪一步</div>` : ''}
+    ${noEvidence.length ? `<div class="warn muted">有 ${noEvidence.length} 处勾了跨章但没有证据</div>` : ''}
+    ${pending ? `<div class="row"><button data-act="next-pending">下一处待审（还剩 ${pending} 处）</button></div>` : ''}
+    ${checkItems.map(([k, text]) => box(k, text)).join('')}
+    ${prov}
+    ${s.provenance ? '' : '<div class="muted">选好本章来源才能标完。</div>'}
+    <div class="row">${s.status === 'done'
+      ? '<span class="ok">已完成</span><button data-act="reopen">重新打开</button>'
+      : `<button class="primary" data-act="done" ${checksDone && !missing.length && !noStuck.length && s.provenance ? '' : 'disabled'}>标完了</button>`}</div>
+    <label class="block">本章备注</label><textarea data-field="chapter-note">${esc(s.note)}</textarea></div>`;
+}
+function precedentCard() {
+  const items = state.precedents.slice().reverse().map(p => `<div class="ev">第${p.chapter_number}章「${esc(p.text || '')}」：${esc(p.decision)}
+      ${p.reason ? `<span class="muted">——${esc(p.reason)}</span>` : ''} <button data-act="prec-del" data-id="${p.id}">删</button></div>`).join('');
+  return `<div class="card"><h3>判例（${state.precedents.length}）</h3>
+    <div class="muted">新判例写下位置、裁决和理由；改规则时回查同类旧标注。会附上当前选中的位置。</div>
+    <label class="block">裁决</label><input type="text" id="prec-decision">
+    <label class="block">理由</label><input type="text" id="prec-reason">
+    <div class="row"><button data-act="prec-add">记下</button></div>${items}</div>`;
+}
+function helpCard() {
+  return `<div class="card"><h3>说明</h3><div class="muted">
+    拖选或单击一个字 → <kbd>1</kbd>–<kbd>6</kbd> 定类型，<kbd>7</kbd> 待审；<kbd>Ctrl</kbd>+<kbd>←</kbd><kbd>→</kbd> 调左边界，
+    <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> 调右边界；<kbd>Del</kbd> 删除；<kbd>Ctrl</kbd>+<kbd>Z</kbd> 撤销；<kbd>Esc</kbd> 取消。<br>
+    本页不显示任何模型或词典的结果。进度自动存在这个浏览器里，但正式记录是“导出”的文件：每标完一章导出一次。</div></div>`;
+}
+function renderSide() {
+  const parts = [selectionCard()];
+  if (cands) parts.push(candidatesCard());
+  parts.push(chapterCard(), precedentCard(), helpCard());
+  side.innerHTML = parts.join('');
+}
+function renderAll() { renderHeader(); renderNav(); renderReader(); renderSide(); }
+
+// ---------- mouse: drag to select characters inside one paragraph ----------
+reader.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  const tag = e.target.closest('sup.tag');
+  if (tag) { e.preventDefault(); selectAnnotation(tag.dataset.ann); return; }
+  const el = e.target.closest('.c');
+  if (!el) return;
+  e.preventDefault();
+  if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+  const i = +el.dataset.i;
+  drag = { anchor: i, focus: i, moved: false };
+});
+reader.addEventListener('mouseover', e => {
+  if (!drag) return;
+  const el = e.target.closest('.c');
+  if (!el) return;
+  const i = +el.dataset.i;
+  if (i === drag.focus || paraIndex(cur(), i) !== paraIndex(cur(), drag.anchor)) return;
+  drag.focus = i; drag.moved = true;
+  sel = { start: Math.min(drag.anchor, i), end: Math.max(drag.anchor, i) + 1 };
+  active = null;
+  renderReader();
+});
+window.addEventListener('mouseup', () => {
+  if (!drag) return;
+  const d = drag;
+  drag = null;
+  const hit = annAt(d.anchor);
+  if (!d.moved && hit) { selectAnnotation(hit.id); return; }
+  sel = { start: Math.min(d.anchor, d.focus), end: Math.max(d.anchor, d.focus) + 1 };
+  active = null;
+  renderReader(); renderSide();
+});
+
+// ---------- side panel ----------
+side.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b || b.tagName === 'SELECT' || b.disabled) return;
+  const s = +b.dataset.s, en = +b.dataset.e;
+  const a = active && byId(active);
+  switch (b.dataset.act) {
+    case 'type': applyType(b.dataset.type); break;
+    case 'adj': adjust(b.dataset.which, +b.dataset.d); break;
+    case 'del': if (a) removeAnnotation(a.id); break;
+    case 'same': if (a) { openCandidates(a.text, a.pending ? 'pending' : a.type); renderSide(); } break;
+    case 'cross':
+      if (a) { remember(); a.cross_chapter = b.checked; a.updated_at = nowISO(); changed(); renderAll(); }
+      break;
+    case 'ev-del':
+      if (a) { remember(); a.evidence.splice(+b.dataset.k, 1); a.updated_at = nowISO(); changed(); renderSide(); }
+      break;
+    case 'cand-apply': createAnnotation(s, en, b.dataset.type, false); break;
+    case 'cand-skip': setSkipped(s, en, true); break;
+    case 'cand-unskip': setSkipped(s, en, false); break;
+    case 'locate': locate(s, en); break;
+    case 'next-pending': {
+      const list = st().annotations.filter(x => x.pending);
+      const from = a ? a.start : -1;
+      const next = list.find(x => x.start > from) || list[0];
+      if (next) { selectAnnotation(next.id); locate(next.start, next.end); }
+      break;
+    }
+    case 'close-cands': cands = null; renderSide(); break;
+    case 'done': remember(); st().status = 'done'; st().done_at = nowISO(); changed(); renderAll(); toast('本章标完了，记得导出'); break;
+    case 'reopen': remember(); st().status = 'doing'; changed(); renderAll(); break;
+    case 'prec-prefill': $('#prec-decision').focus(); break;
+    case 'prec-add': addPrecedent(); break;
+    case 'prec-del':
+      state.precedents = state.precedents.filter(p => p.id !== b.dataset.id); changed(); renderSide();
+      break;
+  }
+});
+side.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.act === 'cand-type' && t.value) createAnnotation(+t.dataset.s, +t.dataset.e, t.value, false);
+  if (t.dataset.check) { st().checks[t.dataset.check] = t.checked; changed(); renderSide(); renderNav(); }
+  if (t.dataset.prov) { remember(); st().provenance = t.value || null; changed(); renderSide(); }
+  if (t.dataset.stuck) {
+    const a = active && byId(active);
+    if (a) {
+      remember();
+      const set = new Set(a.stuck || []);
+      if (t.checked) set.add(t.dataset.stuck); else set.delete(t.dataset.stuck);
+      a.stuck = STUCK.map(([k]) => k).filter(k => set.has(k)); a.updated_at = nowISO();
+      changed(); const card = $('#chapter-card'); if (card) card.outerHTML = chapterCard();
+    }
+  }
+});
+side.addEventListener('input', e => {
+  const t = e.target, f = t.dataset.field;
+  if (!f) return;
+  if (f === 'chapter-note') { st().note = t.value; changed(); return; }
+  const a = active && byId(active);
+  if (!a) return;
+  a[f] = t.value; a.updated_at = nowISO(); changed();
+  // the chapter card shows warnings about empty pending notes; refresh it without touching this textarea
+  if (f === 'candidates' || f === 'doubt') { const card = $('#chapter-card'); if (card) card.outerHTML = chapterCard(); }
+});
+function addPrecedent() {
+  const decision = $('#prec-decision').value.trim(), reason = $('#prec-reason').value.trim();
+  if (!decision) return toast('先写裁决');
+  const a = active && byId(active), span = a || sel;
+  state.precedents.push({
+    id: 'r' + (state.next_id++), chapter_id: cur(), chapter_number: ch().number,
+    start: span ? span.start : null, end: span ? span.end : null, text: span ? ch().text.slice(span.start, span.end) : '',
+    decision, reason, guide_version: DATA.guide_version, created_at: nowISO(),
+  });
+  changed(); renderSide(); toast('判例已记下');
+}
+
+// ---------- chapter list ----------
+nav.addEventListener('click', e => {
+  const b = e.target.closest('[data-act="goto"]');
+  if (!b) return;
+  state.current = b.dataset.cid; sel = null; active = null; cands = null;
+  save(); renderAll(); reader.scrollTop = 0;
+});
+
+// ---------- keyboard ----------
+window.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') { if (e.key === 'Escape') e.target.blur(); return; }
+  if (!modal.hidden) { if (e.key === 'Escape') closeModal(); return; }
+  const k = e.key;
+  if ((e.ctrlKey || e.metaKey) && k.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
+  if (k === 'ArrowLeft' || k === 'ArrowRight') {
+    const d = k === 'ArrowLeft' ? -1 : 1;
+    if (e.ctrlKey) { e.preventDefault(); adjust('start', d); }
+    else if (e.shiftKey) { e.preventDefault(); adjust('end', d); }
+    return;
+  }
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (k >= '1' && k <= '6') { e.preventDefault(); applyType(TYPES[+k - 1].key); }
+  else if (k === '7') { e.preventDefault(); applyType('pending'); }
+  else if (k === 'Escape') { sel = null; active = null; cands = null; renderAll(); }
+  else if ((k === 'Delete' || k === 'Backspace') && active) { e.preventDefault(); removeAnnotation(active); }
+});
+
+// ---------- whole-book search (for cross-chapter evidence) ----------
+function closeModal() { modal.hidden = true; searchState = null; }
+modal.addEventListener('click', e => {
+  if (e.target === modal) return closeModal();
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  if (b.dataset.act === 'close') closeModal();
+  if (b.dataset.act === 'hit') showHit(+b.dataset.k);
+  if (b.dataset.act === 'back') renderSearch();
+  if (b.dataset.act === 'add-ev') addEvidence(+b.dataset.k);
+});
+$('#search-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const q = $('#search-q').value.trim();
+  if (!q) return;
+  const hits = [];
+  let total = 0;
+  for (const c of DATA.book) {
+    for (const [pid, t] of c.paragraphs) {
+      for (let from = 0; ;) {
+        const i = t.indexOf(q, from);
+        if (i < 0) break;
+        from = i + 1; total++;
+        if (hits.length < 300) hits.push({ cid: c.chapter_id, number: c.number, pid, start: i, end: i + q.length, t });
+      }
+    }
+  }
+  searchState = { q, hits, total };
+  renderSearch();
+});
+function renderSearch() {
+  const { q, hits, total } = searchState;
+  modal.hidden = false;
+  modalBox.innerHTML = `<div class="row"><h3 style="margin:0">全书搜索「${esc(q)}」：${total} 处${total > hits.length ? `（只列前 ${hits.length} 处）` : ''}</h3>
+      <span class="grow" style="flex:1"></span><button data-act="close">关闭 <kbd>Esc</kbd></button></div>
+    <div class="muted">点一条看上下文。本章内的上下文不用记成跨章证据。</div>
+    ${hits.map((h, k) => `<div class="hit ${h.cid === cur() ? 'here' : ''}" data-act="hit" data-k="${k}">
+      <span class="muted">第${h.number}章 ${h.pid}</span> ${ctxHTML(h.t, h.start, h.end, 22)}</div>`).join('')}`;
+}
+function showHit(k) {
+  const h = searchState.hits[k];
+  const book = DATA.book.find(c => c.chapter_id === h.cid);
+  const idx = book.paragraphs.findIndex(p => p[0] === h.pid);
+  const around = book.paragraphs.slice(Math.max(0, idx - 2), idx + 3);
+  const a = active && byId(active);
+  const canAdd = a && h.cid !== cur();
+  modalBox.innerHTML = `<div class="row"><button data-act="back">← 返回结果</button>
+      <h3 style="margin:0">第${h.number}章 ${esc(h.pid)}</h3><span style="flex:1"></span><button data-act="close">关闭</button></div>
+    ${around.map(([pid, t]) => pid === h.pid
+      ? `<p class="para-view">${esc(t.slice(0, h.start))}<b style="background:var(--sel);font-weight:normal">${esc(t.slice(h.start, h.end))}</b>${esc(t.slice(h.end))}</p>`
+      : `<p class="para-view dim">${esc(t)}</p>`).join('')}
+    <div class="row">${canAdd
+      ? `<button class="primary" data-act="add-ev" data-k="${k}">加为「${esc(a.text)}」的跨章证据</button>`
+      : `<span class="muted">${h.cid === cur() ? '这是本章的内容，不算跨章证据。' : '先在正文里点选要挂证据的那处标注，再来加证据。'}</span>`}</div>`;
+}
+function addEvidence(k) {
+  const h = searchState.hits[k], a = active && byId(active);
+  if (!a) return;
+  remember();
+  a.evidence.push({
+    chapter_id: h.cid, chapter_number: h.number, paragraph_id: h.pid, start: h.start, end: h.end,
+    quote: h.t.slice(Math.max(0, h.start - 12), Math.min(h.t.length, h.end + 12)),
+  });
+  a.cross_chapter = true; a.updated_at = nowISO();
+  changed(); closeModal(); renderAll(); toast('证据已加上，并勾选了“依赖跨章证据”；不影响裁决的话可以取消勾选');
+}
+
+// ---------- export / import ----------
+$('#export-btn').addEventListener('click', () => {
+  state.exported_at = nowISO();
+  const blob = new Blob([JSON.stringify(state, null, 1)], { type: 'application/json' });
+  const link = document.createElement('a');
+  const stamp = state.exported_at.replace(/[-:]/g, '').replace('T', '-').slice(0, 13);
+  link.href = URL.createObjectURL(blob);
+  link.download = `annotations_${DATA.set}_${stamp}.json`;
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 10000);
+  save(); toast('已导出到浏览器的下载文件夹');
+});
+$('#import-btn').addEventListener('click', () => $('#import-file').click());
+$('#import-file').addEventListener('change', async () => {
+  const input = $('#import-file'), f = input.files[0];
+  if (!f) return;
+  try {
+    const s = adopt(JSON.parse(await f.text()));
+    if (confirm(`用这个文件替换页面上现有的标注？（文件导出于 ${s.exported_at || '未知时间'}）`)) {
+      state = s; undoStack.length = 0; sel = null; active = null; cands = null;
+      save(); renderAll(); toast('已导入');
+    }
+  } catch (err) { alert('导入失败：' + err.message); }
+  finally { input.value = ''; }
+});
+
+// ---------- timer: counts only while the page is visible and in use ----------
+let lastActivity = Date.now();
+for (const ev of ['mousemove', 'mousedown', 'keydown', 'wheel', 'scroll']) {
+  window.addEventListener(ev, () => { lastActivity = Date.now(); }, { passive: true, capture: true });
+}
+setInterval(() => {
+  if (document.visibilityState !== 'visible' || Date.now() - lastActivity > 120000) return;
+  const s = st();
+  if (s.status === 'done') return;
+  s.seconds += 1;
+  if (s.seconds % 15 === 0) save();
+  const el = document.getElementById('timer');
+  if (el) el.textContent = fmtTime(s.seconds);
+}, 1000);
+
+// test hooks (read-only use from the developer console)
+window.__ner = {
+  get state() { return state; },
+  select(start, end) {
+    if (!(0 <= start && start < end && end <= ch().text.length)) throw new Error('bad range');
+    sel = { start, end }; active = null; renderAll();
+  },
+  apply: applyType,
+  chapterText: cid => CH[cid || cur()].text,
+};
+
+renderAll();
+if (restored) toast('已从这个浏览器恢复上次的进度');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+ "description": "Character-level BIO tagger trained on weak labels: hfl/chinese-roberta-wwm-ext plus one linear layer over 13 labels (O, B-/I- of six types), partial-label loss (a one-label set is ordinary cross-entropy; an all-13 set is left out). The setting (S1/S2/S3) picks the weak build's label file; only its 'train' chapters (1-780 minus the 31 dev chapters) are used, and the weak build's record (runs/<weak_build>/config.json) must match the label file's sha256, the snapshot and the training chapters. Dev (the answered dev chapters in gold_dev) picks the checkpoint inside a run (best strict micro F1, ties: earlier) and, across runs, the setting. Hyperparameters are the common defaults from the backbone survey, fixed before any run, not tuned on dev. AdamW applies weight_decay to weight matrices only (not biases or LayerNorm). quote_map: six characters the HFL vocabulary lacks, replaced one for one before tokenizing so offsets do not move. deterministic: torch deterministic algorithms in strict mode (an op without a deterministic version stops the run), so the same seed repeats exactly.",
+ "snapshot": "to0990-79dc77f8d354",
+ "weak_build": "20261003-weak_v1",
+ "dev_set": "configs/annotate_dev.json",
+ "gold_dev": "data/gold/dev/20261001-215315_guide-v1.1.json",
+ "backbone": {
+  "id": "hfl/chinese-roberta-wwm-ext",
+  "revision": "5c58d0b8ec1d9014354d691c538661bf00bfdb44",
+  "license": "apache-2.0",
+  "download_note": "pytorch_model.bin 411,578,458 bytes plus small tokenizer files (about 412 MB); no safetensors in the repo"
+ },
+ "max_chars": 500,
+ "max_tokens": 512,
+ "stride": 128,
+ "lr": 3e-05,
+ "weight_decay": 0.01,
+ "warmup": 0.1,
+ "schedule": "linear",
+ "grad_clip": 1.0,
+ "batch_size": 16,
+ "max_epochs": 6,
+ "eval_every": 0.5,
+ "patience": 3,
+ "bf16": true,
+ "deterministic": true,
+ "quote_map": {"“": "「", "”": "」", "‘": "『", "’": "』", "…": "⋯", "—": "─"}
+}
