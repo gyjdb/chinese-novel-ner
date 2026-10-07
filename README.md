@@ -4,6 +4,8 @@ Named-entity recognition on a long Chinese web novel, where many names are inven
 
 The novel text, the answer keys and all model outputs are **not** included: the novel is copyrighted. This repository holds the code, the configurations, the annotation guideline and the final numbers.
 
+The project was developed in a private repository; this is a snapshot of it published after the final evaluation, so the history here starts at that release.
+
 ## Task
 
 - Six entity types: person, location, organization, item, dungeon, trait.
